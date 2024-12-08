@@ -1,7 +1,7 @@
 
 OUTPUT_FORMAT(elf64-x86-64)
 
-ENTRY(kmain)
+ENTRY(kernel_entry)
 
 PHDRS
 {
