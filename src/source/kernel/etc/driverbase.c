@@ -117,3 +117,47 @@ size_t strlen(const char *str) {
 void outbwait() {
     outb(0x80, 0);
 }
+
+char* itoa(uint64_t value, char* str, int base ) {
+    char * rc;
+    char * ptr;
+    char * low;
+    if ( base < 2 || base > 36 )
+    {
+        *str = '\0';
+        return str;
+    }
+    rc = ptr = str;
+    if ( value < 0 && base == 10 )
+    {
+        *ptr++ = '-';
+    }
+    low = ptr;
+    do
+    {
+        *ptr++ = "ZYXWVUTSRQPONMLKJIHGFEDCBA9876543210123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[35 + value % base];
+        value /= base;
+    } while ( value );
+    *ptr-- = '\0';
+    while ( low < ptr )
+    {
+        char tmp = *low;
+        *low++ = *ptr;
+        *ptr-- = tmp;
+    }
+    return rc;
+}
+
+uint64_t offset = 0;
+
+uint64_t* virt2Phys(uint64_t address) {
+    return (uint64_t*)((uint64_t)address + offset);
+}
+
+uint64_t* phys2Virt(uint64_t address) {
+    return (uint64_t*)((uint64_t)address + offset);
+}
+
+void virtSetOffset(uint64_t ofset) {
+    offset = ofset;
+}

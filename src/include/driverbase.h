@@ -23,3 +23,11 @@ void hlt();
 void outbwait();
 
 uint64_t rdtsc();
+
+char* itoa(uint64_t value, char* str, int base );
+
+uint64_t* virt2Phys(uint64_t address);
+
+uint64_t* phys2Virt(uint64_t address);
+
+void virtSetOffset(uint64_t ofset);

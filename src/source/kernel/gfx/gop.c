@@ -88,6 +88,11 @@ char gopGetFastState() {
     return gopFastState;
 }
 
+void gopDisableBackbuffer() {
+    gopBackBufferState = 0;
+    gopCurrentFrameBufferBase = gopFrameBufferBase;
+}
+
 uint32_t* gopGetFramebuffer() {
     return gopCurrentFrameBufferBase;
 }
