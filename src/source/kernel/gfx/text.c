@@ -108,3 +108,21 @@ uint32_t textGetFG() {
 uint32_t textGetBG() {
     return charBackGround;
 }
+
+void textSetX(uint32_t x,uint32_t screenx) {
+    charX = x;
+    textScreenX = screenx;
+}
+
+void textSetY(uint32_t y,uint32_t screeny) {
+    charY = y;
+    textScreenY = screeny;
+}
+
+uint8_t getFontSizeX() {
+    return fontSizeX;
+}
+
+uint8_t getFontSizeY() {
+    return fontSizeY;
+}

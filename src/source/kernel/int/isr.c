@@ -56,19 +56,24 @@ uint64_t saveCR2() {
     return cr2;
 }
 
+
 void exceptionHandler(struct interrupt_frame frame) {
     gopFastEnable();
+    gopDisableBackbuffer();
     textSetBG(0);
     textSetFG(0xFFFFFF);
     textClearTextScreen();
     printDuck();
-    printf("                        Kernel Panic\n\n");
-    printf("                        Information\n\n");
+    textSetX(25,24*getFontSizeX());
+    printf("Kernel Panic\n\n");
+    textSetX(25,24*getFontSizeX());
+    printf("Information\n\n");
     printf(" RAX: 0x%p    RBX: 0x%p    RDX: 0x%p    RCX: 0x%p    RDI: 0x%p\n",frame.rax,frame.rbx,frame.rdx,frame.rcx,frame.rdi);
     printf(" RSI: 0x%p    R15: 0x%p    R14: 0x%p    R13: 0x%p    R12: 0x%p\n",frame.rsi,frame.r15,frame.r14,frame.r13,frame.r12);
     printf(" R11: 0x%p    R10: 0x%p    R9: 0x%p     R8: 0x%p      RBP: 0x%p\n",frame.r11,frame.r10,frame.r9,frame.r8,frame.rbp);
     printf(" RIP: 0x%p    SS: 0x%p     ERR: 0x%p    CS: 0x%p     RFLAGS: 0x%p\n",frame.rip,frame.ss,frame.error_code,frame.cs,frame.rflags);
     printf(" RSP: 0x%p    VEC: 0x%p    CR2: 0x%p     Exception: 0x%p\n",frame.rsp,frame.vec,saveCR2(),frame.r15);
     printf(" Text: %s\n",exceptions[frame.r15]);
+
     freezeKernel();
 }

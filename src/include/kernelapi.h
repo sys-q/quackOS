@@ -55,6 +55,14 @@ uint32_t textGetFG();
 
 uint32_t textGetBG();
 
+void textSetX(uint32_t x,uint32_t screenx);
+
+void textSetY(uint32_t y,uint32_t screeny);
+
+uint8_t getFontSizeX();
+
+uint8_t getFontSizeY();
+
 // CMOS
 
 #define CMOS_ADDRESS 0x70
