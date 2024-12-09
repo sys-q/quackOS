@@ -7,4 +7,4 @@ x86_64 OS
 make run-build
 ```
 
-also you need llvm,clang,nasm,xorriso and make
+also you need ld,clang,nasm,xorriso and make
