@@ -6,3 +6,5 @@ x86_64 OS
 ```sh
 make run-build
 ```
+
+also you need llvm,gcc,nasm,xorriso and make
