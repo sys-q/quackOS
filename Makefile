@@ -1,10 +1,10 @@
 QEMU=qemu-system-x86_64
 QEMUFLAGS=-machine smm=off -no-reboot -m 2G -d int -drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-x86_64.fd,readonly=on
 CC=clang
-CFLAGS=-Wall -target x86_64-pc-linux-gnu -Wextra -nostdinc -ffreestanding -m64 -march=x86-64 -I./freestanding-headers -I./src/include -std=gnu11 -Wno-implicit-function-declaration
+CFLAGS=-fno-stack-protector -Wall -target x86_64-pc-linux-gnu -Wextra -nostdinc -ffreestanding -m64 -march=x86-64 -I./freestanding-headers -I./src/include -std=gnu11 -Wno-implicit-function-declaration
 ASM=nasm
 ASMFLAGS=-Wall -f elf64
-LD=ld.lld 
+LD=ld
 LDFLAGS=-m elf_x86_64 -nostdlib -static -z max-page-size=0x1000 -gc-sections -T src/link.ld
 OUTPUTISO=build/output.iso
 XORRISO=xorriso
@@ -20,6 +20,7 @@ build: clean prepare_build $(TARGETKERNEL)
 	$(XORRISO) $(XORRISOFLAGS)
 
 prepare_build: $(TARGETKERNEL)
+	mkdir -p build
 	rm -rf build/*
 	cp -rf limine/directory/iso_root/* build
 
