@@ -1,5 +1,5 @@
 QEMU=qemu-system-x86_64
-QEMUFLAGS=-machine smm=off -no-reboot -m 2G -d int -drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-x86_64.fd,readonly=on
+QEMUFLAGS=-machine smm=off -no-reboot -m 20G -d int -drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-x86_64.fd,readonly=on
 CC=clang
 CFLAGS=-fno-stack-protector -Wall -target x86_64-pc-linux-gnu -Wextra -nostdinc -ffreestanding -m64 -march=x86-64 -I./freestanding-headers -I./src/include -std=gnu11 -Wno-implicit-function-declaration
 ASM=nasm

@@ -204,12 +204,38 @@ void initIDT();
 typedef struct {
     uint64_t bits;
     uint64_t size;
+    uint64_t next;
+    uint64_t num_pages;
+    uint64_t pages_count;
 } bitmap_t;
 
 typedef struct {
-    uint64_t* base;
+    uint64_t base;
     uint64_t length;
     uint64_t skip;
     bitmap_t bitmap;
 } memory_entry_t;
 
+void bitmapSetBit(bitmap_t *bmp, uint64_t index);
+
+void bitmapClearBit(bitmap_t *bmp, uint64_t index);
+
+int bitmapIsBitSet(bitmap_t *bmp, uint64_t index);
+
+uint64_t allocPage();
+
+void freePage(uint64_t page);
+
+uint64_t allocPages(uint64_t num_pages);
+
+void freePages(uint64_t start_page, uint64_t num_pages);
+
+uint64_t sizeToPages(uint64_t size);
+
+memory_entry_t* getBiggestEntry();
+
+uint64_t* earlyMalloc(uint64_t size);
+
+bitmap_t bitmapInit(uint64_t size);
+
+void initPMM();

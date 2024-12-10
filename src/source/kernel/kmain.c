@@ -2,7 +2,14 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <kernelapi.h>
+#include <driverbase.h>
 #include <limine.h>
+
+__attribute__((used, section(".limine_requests")))
+static volatile struct limine_hhdm_request hhdm_request = {
+    .id = LIMINE_HHDM_REQUEST,
+    .revision = 0
+};
 
 void kmain(void) {
     initGop();
@@ -15,5 +22,8 @@ void kmain(void) {
     initGDT();
     logPrintf("Initializing IDT\n");
     initIDT();
+    virtSetOffset(hhdm_request.response->offset);
+    logPrintf("Initializing PMM\n");
+    initPMM();
     osMain();
 }
