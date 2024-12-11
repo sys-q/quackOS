@@ -151,7 +151,7 @@ char* itoa(uint64_t value, char* str, int base ) {
 uint64_t offset = 0;
 
 uint64_t* virt2Phys(uint64_t address) {
-    return (uint64_t*)((uint64_t)address + offset);
+    return (uint64_t*)((uint64_t)address - offset);
 }
 
 uint64_t* phys2Virt(uint64_t address) {

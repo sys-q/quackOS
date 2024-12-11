@@ -27,6 +27,10 @@ int bitmapIsBitSet(bitmap_t *bmp, uint64_t index) {
 
 memory_entry_t biggest_entry;
 
+struct limine_memmap_request* getMemMap() {
+    return &memmap_request;
+}
+
 memory_entry_t* getBiggestEntry() {
     return &biggest_entry;
 }
@@ -101,6 +105,17 @@ uint64_t allocPage() {
 void freePage(uint64_t page) {
     bitmapClearBit(&biggest_entry.bitmap,page);
     biggest_entry.bitmap.pages_count--;
+}
+
+uint64_t allocZeroPage() {
+    uint64_t page = allocPage();
+    memset(phys2Virt(biggest_entry.base + (page*PAGE_SIZE)),0,PAGE_SIZE);
+    return page;
+}
+
+uint64_t allocZeroPagePhys() {
+    uint64_t page = allocZeroPage();
+    return biggest_entry.base + (page*PAGE_SIZE);
 }
 
 uint64_t allocPages(uint64_t num_pages) {

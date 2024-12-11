@@ -232,10 +232,47 @@ void freePages(uint64_t start_page, uint64_t num_pages);
 
 uint64_t sizeToPages(uint64_t size);
 
+struct limine_memmap_request* getMemMap();
+
 memory_entry_t* getBiggestEntry();
 
 uint64_t* earlyMalloc(uint64_t size);
 
 bitmap_t bitmapInit(uint64_t size);
 
+uint64_t allocZeroPage();
+
+uint64_t allocZeroPagePhys();
+
 void initPMM();
+
+// VMM
+
+#define PML4 0x01
+#define PDP 0x02
+#define PD 0x03
+#define PT 0x04
+#define ROUNDUP(VALUE,ROUND) ((VALUE + (ROUND - 1)) / ROUND)
+#define ALIGNPAGEUP(VALUE) (ROUNDUP(VALUE,PAGE_SIZE) * PAGE_SIZE)
+#define ALIGNPAGEDOWN(VALUE) ((VALUE / PAGE_SIZE) * PAGE_SIZE)
+#define PTE_MASK_VALUE 0x000ffffffffff000
+#define PTE_MASK(VALUE,FLAGS) (VALUE | FLAGS)
+#define PTE_UNMASK(VALUE) (VALUE & PTE_MASK_VALUE)
+#define PTE_PRESENT (1 << 0)
+#define PTE_WRITABLE (1 << 1)
+#define PTE_USER (1 << 2)
+#define PTE_KERNELFLAGS PTE_PRESENT | PTE_WRITABLE
+#define PTE_USERFLAGS PTE_PRESENT | PTE_WRITABLE | PTE_USER
+#define PTE_READONLYKERNEL PTE_PRESENT
+
+uint16_t vmmIndex(uint64_t virtual_address,uint8_t type);
+
+void vmmMapPage(uint64_t* pml4,uint64_t phys,uint64_t virt,uint64_t flags);
+
+void vmmMapKernel(uint64_t* pml4);
+
+void vmmMapEntry(uint64_t* pml4,uint16_t type);
+
+void vmmActivatePML(uint64_t* phys_pml);
+
+void initVMM();

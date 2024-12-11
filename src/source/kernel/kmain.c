@@ -25,5 +25,7 @@ void kmain(void) {
     virtSetOffset(hhdm_request.response->offset);
     logPrintf("Initializing PMM\n");
     initPMM();
+    logPrintf("Initializing Paging\n");
+    initVMM();
     osMain();
 }
