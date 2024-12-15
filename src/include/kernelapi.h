@@ -301,10 +301,6 @@ void irqSetupHandler(uint16_t vector, void (*func)(uint16_t));
 
 // PIT
 
-#define PIT_CHANNEL0 0x40
-#define PIT_COMMAND 0x43
-#define PIT_FREQUENCY 1193182
-
 void initPIT(uint32_t freq);
 
 uint64_t pitCurrentTicks();

@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <kernelapi.h>
+#include <variables.h>
 #include <driverbase.h>
 #include <limine.h>
 
@@ -31,5 +32,11 @@ void kmain(void) {
     initVMM();
     logPrintf("Initializing PIT\n");
     initPIT(100);
+    logPrintf("Initializing BackBuffer\n");
+    uint64_t backbufferSize = gopGetPitch() * gopGetHeight();
+    uint64_t backbufferPages = sizeToPages(backbufferSize);
+    uint64_t startBackBuffer = allocPages(backbufferPages);
+    uint64_t backbufferBase = (startBackBuffer * PAGE_SIZE) + getBiggestEntry()->base;
+    gopBackBuffer((uint32_t*)phys2Virt(backbufferBase));
     osMain();
 }

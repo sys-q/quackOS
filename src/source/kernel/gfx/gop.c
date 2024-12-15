@@ -57,11 +57,15 @@ void gopClear(uint32_t color) {
             memset(gopFrameBufferBase,(uint8_t)color,gopHeight*gopPitch);
     }
     else {
+        if(!gopBackBufferState)
+            cli();
         for(uint32_t x = 0;x < gopWidth;x++) {
             for(uint32_t y = 0;y < gopWidth;y++) {
                 gopPaint(x,y,color);
             }
         }
+        if(!gopBackBufferState)
+            sti();
     }
 }
 
@@ -69,6 +73,7 @@ void gopBackBuffer(uint32_t* backbuffer) {
     gopBackBufferBase = backbuffer;
     gopCurrentFrameBufferBase = backbuffer;
     gopBackBufferState = 1;
+    memcpy(gopBackBufferBase,gopFrameBufferBase,gopHeight * gopPitch); // save old framebuffer to backbuffer
 }
 
 void gopSwap() {
