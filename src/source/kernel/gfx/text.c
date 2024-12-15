@@ -14,7 +14,7 @@ uint32_t textScreenY = 0;
 uint8_t fontSizeX = 8;
 uint8_t fontSizeY = 15;
 
-void textDrawChar(int xOffset, int yOffset, int color, char ch) {
+void textDrawChar(int xOffset, int yOffset, uint32_t color, char ch) {
     int firstByteIdx = ch * 16;
     bool doDrawBuffer;
     for (int by = 0; by < 16; by++) { 
@@ -31,9 +31,18 @@ void textDrawChar(int xOffset, int yOffset, int color, char ch) {
     }
 }
 
-void textDrawString(char* String,int X,int Y,int Color){
+void textDrawString(char* String,int X,int Y,uint32_t Color){
     int TX = X;
     for(int i=0;i<strlen(String);i++){
+        textDrawChar(TX,Y,Color,String[i]);
+        TX += 8;
+    }
+}
+
+void textDrawStringClear(char* String,int X,int Y,uint32_t Color){
+    int TX = X;
+    for(int i=0;i<strlen(String);i++){
+        textClearCharGFX(TX,Y);
         textDrawChar(TX,Y,Color,String[i]);
         TX += 8;
     }
@@ -75,6 +84,14 @@ void kernelInitTextMode() {
 void textClearChar(int x, int y){
     x = x * fontSizeX;
     y = y * fontSizeY;
+    for (int by = 0; by < 16; by++) { 
+        for (int bi = 0; bi < 8; bi++) {
+            gopPaint(x + bi, y + by, charBackGround);
+        }
+    }
+}
+
+void textClearCharGFX(int x, int y){
     for (int by = 0; by < 16; by++) { 
         for (int bi = 0; bi < 8; bi++) {
             gopPaint(x + bi, y + by, charBackGround);

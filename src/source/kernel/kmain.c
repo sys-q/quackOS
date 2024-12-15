@@ -22,10 +22,14 @@ void kmain(void) {
     initGDT();
     logPrintf("Initializing IDT\n");
     initIDT();
+    logPrintf("Initializing PIC\n");
+    picRemap();
     virtSetOffset(hhdm_request.response->offset);
     logPrintf("Initializing PMM\n");
     initPMM();
     logPrintf("Initializing Paging\n");
     initVMM();
+    logPrintf("Initializing PIT\n");
+    initPIT(100);
     osMain();
 }

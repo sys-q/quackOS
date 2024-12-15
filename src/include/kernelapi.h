@@ -31,9 +31,11 @@ uint32_t* gopGetFramebuffer();
 
 // Text
 
-void textDrawChar(int xOffset, int yOffset, int colour, char ch);
+void textDrawChar(int xOffset, int yOffset, uint32_t color, char ch);
 
-void textDrawString(char* String,int X,int Y,int Color);
+void textDrawString(char* String,int X,int Y,uint32_t Color);
+
+void textDrawStringClear(char* String,int X,int Y,uint32_t Color);
 
 void textPrintChar(char key);
 
@@ -62,6 +64,8 @@ void textSetY(uint32_t y,uint32_t screeny);
 uint8_t getFontSizeX();
 
 uint8_t getFontSizeY();
+
+void textClearCharGFX(int x, int y);
 
 // CMOS
 
@@ -197,7 +201,11 @@ typedef struct __attribute__((packed)) {
 
 void exceptionHandler(struct interrupt_frame frame);
 
+void idtSetDescriptor(uint8_t index,void* isr,uint8_t flags);
+
 void initIDT();
+
+void loadIDT();
 
 // PMM
 
@@ -276,3 +284,27 @@ void vmmMapEntry(uint64_t* pml4,uint16_t type);
 void vmmActivatePML(uint64_t* phys_pml);
 
 void initVMM();
+
+// PIC
+
+void picRemap();
+
+void picEOI(uint8_t irq);
+
+void picSetMask(uint8_t irq);
+
+void picClearMask(uint8_t irq);
+
+// IRQ
+
+void irqSetupHandler(uint16_t vector, void (*func)(uint16_t));
+
+// PIT
+
+#define PIT_CHANNEL0 0x40
+#define PIT_COMMAND 0x43
+#define PIT_FREQUENCY 1193182
+
+void initPIT(uint32_t freq);
+
+uint64_t pitCurrentTicks();

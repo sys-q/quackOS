@@ -2,6 +2,8 @@
 #include <driverbase.h>
 #include <kernelapi.h>
 
+// CMOS wait second and etc will not work with PIT and etc
+
 static inline uint8_t cmos_read(uint8_t reg) {
     outb(CMOS_ADDRESS, reg);
     return inb(CMOS_DATA);
@@ -48,13 +50,8 @@ void cmosSleep(int seconds){
 }
 
 void cmosWaitSecond() {
-    uint8_t last, current;
-    current = cmosSecond();
-    last = cmosSecond();
-    while(1){
-        if(last != current){
-            return;
-        }
-        last = cmosSecond();
+    uint8_t last = cmosSecond();
+    while(cmosSecond() == last) {
+        nop();
     }
 }

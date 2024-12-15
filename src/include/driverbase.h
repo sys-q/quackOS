@@ -31,3 +31,5 @@ uint64_t* virt2Phys(uint64_t address);
 uint64_t* phys2Virt(uint64_t address);
 
 void virtSetOffset(uint64_t ofset);
+
+extern void gsSwitch();

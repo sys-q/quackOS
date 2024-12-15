@@ -73,7 +73,6 @@ void initPMM() {
 }
 
 uint64_t allocPage() {
-    cli();
     uint64_t next_page = biggest_entry.bitmap.next;
     if(next_page != 0) {
         if(!bitmapIsBitSet(&biggest_entry.bitmap,next_page))
@@ -81,7 +80,6 @@ uint64_t allocPage() {
         if(!bitmapIsBitSet(&biggest_entry.bitmap,next_page + 1)){
             biggest_entry.bitmap.next++;
             biggest_entry.bitmap.pages_count++;
-            sti();
             return next_page;
         }
         else 
@@ -94,7 +92,6 @@ uint64_t allocPage() {
                 biggest_entry.bitmap.next = 0;
             bitmapSetBit(&biggest_entry.bitmap,i);
             biggest_entry.bitmap.pages_count++;
-            sti();
             return i;
         }
     }
@@ -118,11 +115,12 @@ uint64_t allocZeroPagePhys() {
     return biggest_entry.base + (page*PAGE_SIZE);
 }
 
+
+// some shitcode which i using only for backbuffer
 uint64_t allocPages(uint64_t num_pages) {
     if (num_pages == 0) {
         return 0; 
     }
-    cli();
     uint64_t start_index = biggest_entry.bitmap.next;
     uint64_t contiguous_count = 0;
     for (uint64_t i = start_index; i < biggest_entry.bitmap.pages_count; i++) {
@@ -134,7 +132,6 @@ uint64_t allocPages(uint64_t num_pages) {
                 }
                 biggest_entry.bitmap.next = (i + 1) % biggest_entry.bitmap.pages_count;
                 biggest_entry.bitmap.pages_count += num_pages; 
-                sti();
                 return i - num_pages + 1; 
             }
         } else {
@@ -150,7 +147,6 @@ uint64_t allocPages(uint64_t num_pages) {
                 }
                 biggest_entry.bitmap.next = (i + 1) % biggest_entry.bitmap.pages_count;
                 biggest_entry.bitmap.pages_count += num_pages; 
-                sti();
                 return i - num_pages + 1; 
             }
         } else {
@@ -161,7 +157,6 @@ uint64_t allocPages(uint64_t num_pages) {
 }
 
 void freePages(uint64_t start_page, uint64_t num_pages) {
-    cli();
     for (uint64_t i = 0; i < num_pages; i++) {
         bitmapClearBit(&biggest_entry.bitmap, start_page + i); 
     }
@@ -169,7 +164,6 @@ void freePages(uint64_t start_page, uint64_t num_pages) {
     if (biggest_entry.bitmap.next != 0 && start_page < biggest_entry.bitmap.next) {
         biggest_entry.bitmap.next = start_page;
     }
-    sti();
 }
 
 uint64_t sizeToPages(uint64_t size) {

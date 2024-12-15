@@ -3,6 +3,7 @@
 %macro isr 1
 global isr_%+%1
 isr_%+%1:
+    cli
     mov r15,%+%1
     call asmExceptionHandler
 %endmacro
@@ -10,9 +11,12 @@ isr_%+%1:
 extern fixed
 extern exceptionHandler
 asmExceptionHandler:
-    cmp qword [rsp + 16],0x3b
-    jne .continue
+    cli 
+    mov r14,0
+    cmp qword [rsp + 8],0x08
+    jz .continue
     swapgs
+    mov r14,1
  .continue:
     push r15
     push r14
@@ -32,30 +36,13 @@ asmExceptionHandler:
     cld
 
     mov rdi,rsp
-    xor rbp,rbp
+    mov rsi,r14
     call exceptionHandler
 
-    pop rax
-    pop rbx
-    pop rcx
-    pop rdx
-    pop rdi
-    pop rbp
-    pop r8
-    pop r9
-    pop r10
-    pop r11
-    pop r12
-    pop r13
-    pop r14
-    pop r15
-    add rsp,16
-    cmp qword [rsp + 8],0x3b
-    jne .end
-    swapgs
+ .end:    
+    hlt
+    jmp short .end 
 
- .end:
-    iretq
 
 
 isr 0
@@ -80,3 +67,5 @@ isr 18
 isr 19
 isr 20
 isr 30
+
+oldExceptionSeg db 0 
