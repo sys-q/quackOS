@@ -4,6 +4,6 @@
 
 void osMain() {
     while(1) {
-        hlt();
+        nop();
     }
 }

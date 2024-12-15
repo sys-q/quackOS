@@ -28,16 +28,17 @@ void kmain(void) {
     virtSetOffset(hhdm_request.response->offset);
     logPrintf("Initializing PMM\n");
     initPMM();
+    logPrintf("Initializing BackBuffer\n");
+    uint64_t backbufferSize = gopGetPitch() * gopGetHeight();
+    uint64_t backbufferPages = sizeToPages(backbufferSize);
+    uint64_t startBackBuffer = allocZeroPagePhys();
+    for(uint64_t i = 0;i < backbufferPages;i++) { // + 1 extra page
+        allocZeroPagePhys();
+    }   
+    gopBackBuffer((uint32_t*)phys2Virt(startBackBuffer));
     logPrintf("Initializing Paging\n");
     initVMM();
     logPrintf("Initializing PIT\n");
     initPIT(100);
-    logPrintf("Initializing BackBuffer\n");
-    uint64_t backbufferSize = gopGetPitch() * gopGetHeight();
-    uint64_t backbufferPages = sizeToPages(backbufferSize);
-    uint64_t startBackBuffer = allocPages(backbufferPages);
-    uint64_t backbufferBase = (startBackBuffer * PAGE_SIZE) + getBiggestEntry()->base;
-    textClearTextScreen();
-    gopBackBuffer((uint32_t*)phys2Virt(backbufferBase));
     osMain();
 }

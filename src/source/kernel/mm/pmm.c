@@ -115,57 +115,6 @@ uint64_t allocZeroPagePhys() {
     return biggest_entry.base + (page*PAGE_SIZE);
 }
 
-
-// some shitcode which i using only for backbuffer
-uint64_t allocPages(uint64_t num_pages) {
-    if (num_pages == 0) {
-        return 0; 
-    }
-    uint64_t start_index = biggest_entry.bitmap.next;
-    uint64_t contiguous_count = 0;
-    for (uint64_t i = start_index; i < biggest_entry.bitmap.pages_count; i++) {
-        if (!bitmapIsBitSet(&biggest_entry.bitmap, i)) {
-            contiguous_count++;
-            if (contiguous_count == num_pages) {
-                for (uint64_t j = 0; j < num_pages; j++) {
-                    bitmapSetBit(&biggest_entry.bitmap, i - num_pages + 1 + j);
-                }
-                biggest_entry.bitmap.next = (i + 1) % biggest_entry.bitmap.pages_count;
-                biggest_entry.bitmap.pages_count += num_pages; 
-                return i - num_pages + 1; 
-            }
-        } else {
-            contiguous_count = 0;
-        }
-    }
-    for (uint64_t i = 0; i < start_index; i++) {
-        if (!bitmapIsBitSet(&biggest_entry.bitmap, i)) {
-            contiguous_count++;
-            if (contiguous_count == num_pages) {
-                for (uint64_t j = 0; j < num_pages; j++) {
-                    bitmapSetBit(&biggest_entry.bitmap, i - num_pages + 1 + j);
-                }
-                biggest_entry.bitmap.next = (i + 1) % biggest_entry.bitmap.pages_count;
-                biggest_entry.bitmap.pages_count += num_pages; 
-                return i - num_pages + 1; 
-            }
-        } else {
-            contiguous_count = 0; 
-        }
-    }
-    return 0; 
-}
-
-void freePages(uint64_t start_page, uint64_t num_pages) {
-    for (uint64_t i = 0; i < num_pages; i++) {
-        bitmapClearBit(&biggest_entry.bitmap, start_page + i); 
-    }
-    biggest_entry.bitmap.pages_count -= num_pages; 
-    if (biggest_entry.bitmap.next != 0 && start_page < biggest_entry.bitmap.next) {
-        biggest_entry.bitmap.next = start_page;
-    }
-}
-
 uint64_t sizeToPages(uint64_t size) {
     uint64_t pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
     if(size > PAGE_SIZE - 10)

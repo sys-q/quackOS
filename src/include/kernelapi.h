@@ -234,10 +234,6 @@ uint64_t allocPage();
 
 void freePage(uint64_t page);
 
-uint64_t allocPages(uint64_t num_pages);
-
-void freePages(uint64_t start_page, uint64_t num_pages);
-
 uint64_t sizeToPages(uint64_t size);
 
 struct limine_memmap_request* getMemMap();

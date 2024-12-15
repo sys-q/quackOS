@@ -20,7 +20,7 @@ static volatile LIMINE_REQUESTS_END_MARKER;
 
 volatile uint32_t* gopCurrentFrameBufferBase;
 volatile uint32_t* gopFrameBufferBase;
-uint32_t* gopBackBufferBase;
+volatile uint32_t* gopBackBufferBase;
 uint32_t gopHeight;
 uint32_t gopWidth;
 uint32_t gopPitch;
