@@ -37,6 +37,7 @@ void kmain(void) {
     uint64_t backbufferPages = sizeToPages(backbufferSize);
     uint64_t startBackBuffer = allocPages(backbufferPages);
     uint64_t backbufferBase = (startBackBuffer * PAGE_SIZE) + getBiggestEntry()->base;
+    textClearTextScreen();
     gopBackBuffer((uint32_t*)phys2Virt(backbufferBase));
     osMain();
 }

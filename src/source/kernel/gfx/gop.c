@@ -73,7 +73,6 @@ void gopBackBuffer(uint32_t* backbuffer) {
     gopBackBufferBase = backbuffer;
     gopCurrentFrameBufferBase = backbuffer;
     gopBackBufferState = 1;
-    memcpy(gopBackBufferBase,gopFrameBufferBase,gopHeight * gopPitch); // save old framebuffer to backbuffer
 }
 
 void gopSwap() {
