@@ -47,7 +47,18 @@ void kmain(void) {
     gopClear(0);
     logPrintf("Backbuffer phys: 0x%p\n",base_phys);
     logPrintf("Initializing PIT\n");
-    initPIT(50);
-    logPrintf("Allocated page: 0x%p\n",allocZeroPagePhys());
-    osMain();
+    uint32_t fps = 0;
+    uint32_t last = 0;
+    last = cmosSecond();
+    while(true) {
+        gopSwap();
+        fps++;
+        if(last != cmosSecond()) {
+            last = cmosSecond();
+            textSetX(40,40*8);
+            textSetY(40,40*15);
+            printf("FPS: 0x%p",fps);
+            fps = 0;
+        }
+    }
 }

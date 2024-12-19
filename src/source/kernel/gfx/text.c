@@ -57,6 +57,7 @@ void textPrintChar(char key) {
         
         return;
     }
+    textClearCharGFX(textScreenX,textScreenY);
     textDrawChar(textScreenX,textScreenY,charForeGround,key);
     if(charX == maxCharsX - 1) {
             if(charY == maxCharsY) {

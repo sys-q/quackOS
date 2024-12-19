@@ -7,10 +7,10 @@ uint64_t pit_freq;
 
 void pitHandler(uint16_t irq) {
     ticks++;
-    if(ticks % 1 == 0) {
+    if(ticks % 10 == 0) {
         logPrintf("PIT: %d\n",ticks); 
     } 
-    if(ticks % 10 == 0 ) {
+    if(ticks % 100 == 0 ) {
         gopSwap(); 
     }
 }
