@@ -14,6 +14,12 @@ extern uint64_t kernel_start;
 extern uint64_t kernel_end;
 
 uint64_t* kernel_pml;
+uint64_t* pmm_pml;
+char isVMMInitializied;
+
+char isVMMInit() {
+    return isVMMInitializied;
+}
 
 uint64_t* vmmNextLevel(uint64_t* table,uint64_t entry,uint64_t flags) {
     if(!(table[entry] & PTE_PRESENT))
@@ -70,14 +76,75 @@ void vmmMapEntry(uint64_t* pml4,uint16_t type) {
     }
 }
 
+uint64_t vmmSizeEntry(uint16_t type) {
+    struct limine_memmap_entry* current_entry;
+    for(uint64_t i = 0; i < getMemMap()->response->entry_count;i++) {
+        current_entry = getMemMap()->response->entries[i];
+        if(current_entry->type == type) {
+            return current_entry->length;
+        }
+    }
+}
+
+void vmmMapSkipped(uint64_t* pml4) {
+    uint64_t base = getBiggestEntry()->base;
+    uint64_t skip = getBiggestEntry()->skip;
+    base = ALIGNPAGEDOWN(base);
+    skip = ALIGNPAGEUP(skip);
+    for(uint64_t i = 0;i < skip;i += PAGE_SIZE) {
+        logPrintf("Mapping skipped: 0x%p, 0x%p,0x%p\n",i,base + i,(uint64_t)phys2Virt(base + i));
+        vmmMapPage(pml4,base + i,(uint64_t)phys2Virt(base + i),PTE_KERNELFLAGS);
+    }
+}
+
+uint64_t* vmmGetPMM() {
+    return pmm_pml;
+}
+
+uint64_t* gfx_pml;
+
+uint64_t* vmmGetGFX() {
+    return gfx_pml;
+}
+
+uint64_t* vmmGetKernel() {
+    return kernel_pml;
+}
+
+uint64_t startBackBuffer;
+
+void vmmSetBackbuffer(uint64_t i) {
+    startBackBuffer = i;
+}
+
+void vmmMapBackBuffer(uint64_t* pml4) {
+    uint64_t back_size = gopGetHeight() * gopGetPitch();
+    uint64_t back_pages = sizeToPages(back_size) + 1;
+    for(uint64_t i = 0;i < back_pages;i ++) {
+        vmmMapPage(pml4,startBackBuffer + (i * PAGE_SIZE),(uint64_t)phys2Virt(startBackBuffer + (i * PAGE_SIZE)),PTE_KERNELFLAGS);
+    }
+}
+
 void vmmActivatePML(uint64_t* phys_pml) {
     asm volatile("mov %0, %%cr3" : : "r" ((uint64_t)phys_pml) : "memory");
 }
 
+
 void initVMM() {
     kernel_pml = phys2Virt(allocZeroPagePhys());
-    vmmMapEntry(kernel_pml,LIMINE_MEMMAP_USABLE);
     vmmMapEntry(kernel_pml,LIMINE_MEMMAP_FRAMEBUFFER);
+    vmmMapEntry(kernel_pml,LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE);
+    vmmMapSkipped(kernel_pml);
     vmmMapKernel(kernel_pml);
+    pmm_pml = phys2Virt(allocZeroPagePhys());
+    vmmMapEntry(pmm_pml,LIMINE_MEMMAP_USABLE);
+    vmmMapEntry(pmm_pml,LIMINE_MEMMAP_FRAMEBUFFER);
+    vmmMapEntry(pmm_pml,LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE);
+    vmmMapKernel(pmm_pml);
+    vmmMapSkipped(pmm_pml);
+    gfx_pml = phys2Virt(allocZeroPagePhys());
+    vmmMapKernel(gfx_pml);
+    vmmMapEntry(gfx_pml,LIMINE_MEMMAP_FRAMEBUFFER);
     vmmActivatePML(virt2Phys((uint64_t)kernel_pml));
+    isVMMInitializied = 1;
 }

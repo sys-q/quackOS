@@ -248,6 +248,8 @@ uint64_t allocZeroPage();
 
 uint64_t allocZeroPagePhys();
 
+uint64_t allocPages(uint64_t num_pages);
+
 void initPMM();
 
 // VMM
@@ -277,9 +279,23 @@ void vmmMapKernel(uint64_t* pml4);
 
 void vmmMapEntry(uint64_t* pml4,uint16_t type);
 
+void vmmMapBackBuffer(uint64_t* pml4);
+
+uint64_t vmmSizeEntry(uint16_t type);
+
 void vmmActivatePML(uint64_t* phys_pml);
 
 void initVMM();
+
+uint64_t* vmmGetPMM();
+
+uint64_t* vmmGetGFX();
+
+uint64_t* vmmGetKernel();
+
+void vmmSetBackbuffer(uint64_t i);
+
+char isVMMInit();
 
 // PIC
 

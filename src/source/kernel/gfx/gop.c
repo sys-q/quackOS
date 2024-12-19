@@ -76,8 +76,11 @@ void gopBackBuffer(uint32_t* backbuffer) {
 }
 
 void gopSwap() {
-    if(gopBackBufferState)
+    if(gopBackBufferState) {
+        vmmActivatePML(virt2Phys((uint64_t)vmmGetGFX())); 
         memcpy(gopFrameBufferBase,gopBackBufferBase,gopHeight*gopPitch);
+        vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel())); //gopSwap only from PIT or another timer, so it will be kernel pml anyway
+    }
 }
 
 void gopFastEnable() {

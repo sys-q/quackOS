@@ -62,7 +62,8 @@ void exceptionHandler(struct interrupt_frame frame) {
     gopDisableBackbuffer();
     textSetBG(0);
     textSetFG(0xFFFFFF);
-    textClearTextScreen();
+    vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
+    //textClearTextScreen();
     printDuck();
     textSetX(25,24*getFontSizeX());
     printf("Kernel Panic\n\n");

@@ -28,17 +28,26 @@ void kmain(void) {
     virtSetOffset(hhdm_request.response->offset);
     logPrintf("Initializing PMM\n");
     initPMM();
-    logPrintf("Initializing BackBuffer\n");
-    uint64_t backbufferSize = gopGetPitch() * gopGetHeight();
-    uint64_t backbufferPages = sizeToPages(backbufferSize);
-    uint64_t startBackBuffer = allocZeroPagePhys();
-    for(uint64_t i = 0;i < backbufferPages;i++) { // + 1 extra page
-        allocZeroPagePhys();
-    }   
-    gopBackBuffer((uint32_t*)phys2Virt(startBackBuffer));
     logPrintf("Initializing Paging\n");
     initVMM();
+    logPrintf("Initializing BackBuffer\n");
+    uint64_t back_size = gopGetHeight() * gopGetPitch();
+    uint64_t back_pages = sizeToPages(back_size) + 1;
+    uint64_t base = allocPages(back_pages);
+    uint64_t base_phys = (base * PAGE_SIZE) + getBiggestEntry()->base;
+    vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
+    vmmSetBackbuffer(base_phys);
+    vmmMapBackBuffer(vmmGetKernel());
+    vmmMapBackBuffer(vmmGetGFX());
+    vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel()));
     logPrintf("Initializing PIT\n");
-    initPIT(100);
+    gopBackBuffer(phys2Virt(base_phys));
+   // gopDisableBackbuffer();
+    
+    gopClear(0);
+    logPrintf("Backbuffer phys: 0x%p\n",base_phys);
+    logPrintf("Initializing PIT\n");
+    initPIT(50);
+    logPrintf("Allocated page: 0x%p\n",allocZeroPagePhys());
     osMain();
 }
