@@ -46,7 +46,6 @@ void kmain(void) {
     logPrintf("PMM, Paging, GDT, IDT and Paging initializied successfuly !\n");
     logPrintf("Initializing PIT\n");
     initPIT(100);
-    cli();
     textSetFG(0xFFFF00);
     printf("\n\n                __\n");
     printf("            ___( o)>\n");
@@ -54,7 +53,6 @@ void kmain(void) {
     printf("              `---' \n\n");
     printf("        Welcome to quackOS !\n\n\n");
     textSetFG(0xFFFFFF);
-    sti();
     while(1) {
         hlt();
     }
