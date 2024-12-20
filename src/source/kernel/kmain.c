@@ -43,7 +43,7 @@ void kmain(void) {
     vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel()));
     gopBackBuffer(phys2Virt(base_phys));
     textClearTextScreen();
-    logPrintf("PMM, Paging, GDT, IDT and Paging initializied successfuly !\n");
+    logPrintf("PMM, Paging, GDT, IDT and BackBuffer initializied successfuly !\n");
     logPrintf("Initializing PIT\n");
     initPIT(100);
     textSetFG(0xFFFF00);
