@@ -76,6 +76,19 @@ void vmmMapEntry(uint64_t* pml4,uint16_t type) {
     }
 }
 
+void vmmMapEntryFlag(uint64_t* pml4,uint16_t type,uint64_t flag) {
+    struct limine_memmap_entry* current_entry;
+    for(uint64_t i = 0; i < getMemMap()->response->entry_count;i++) {
+        current_entry = getMemMap()->response->entries[i];
+        if(current_entry->type == type) {
+            for(uint64_t i = current_entry->base;i < current_entry->base + current_entry->length;i+=PAGE_SIZE) {
+                vmmMapPage(pml4,i,(uint64_t)phys2Virt(i),flag);
+                //logPrintf("0x%p 0x%p\n",i,phys2Virt(i));
+            }
+        }
+    }
+}
+
 uint64_t vmmSizeEntry(uint16_t type) {
     struct limine_memmap_entry* current_entry;
     for(uint64_t i = 0; i < getMemMap()->response->entry_count;i++) {
@@ -103,8 +116,9 @@ uint64_t* vmmGetPMM() {
 
 uint64_t* gfx_pml;
 
+// idk
 uint64_t* vmmGetGFX() {
-    return gfx_pml;
+    return 0;
 }
 
 uint64_t* vmmGetKernel() {
@@ -129,22 +143,26 @@ void vmmActivatePML(uint64_t* phys_pml) {
     asm volatile("mov %0, %%cr3" : : "r" ((uint64_t)phys_pml) : "memory");
 }
 
+void vmmPatSet(uint8_t idx, uint8_t type){
+    uint64_t pat = rdmsr64(0x277);
+    pat &= ~(0xFFULL << (idx * 8));
+    pat |= ((uint64_t)type << (idx * 8));
+    wrmsr64(0x277, pat);
+}
 
 void initVMM() {
+    vmmPatSet(1,1);
     kernel_pml = phys2Virt(allocZeroPagePhys());
-    vmmMapEntry(kernel_pml,LIMINE_MEMMAP_FRAMEBUFFER);
+    vmmMapEntryFlag(kernel_pml,LIMINE_MEMMAP_FRAMEBUFFER,PTE_PRESENT | PTE_WRITABLE | CACHE_MMIO);
     vmmMapEntry(kernel_pml,LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE);
     vmmMapSkipped(kernel_pml);
     vmmMapKernel(kernel_pml);
     pmm_pml = phys2Virt(allocZeroPagePhys());
     vmmMapEntry(pmm_pml,LIMINE_MEMMAP_USABLE);
-    vmmMapEntry(pmm_pml,LIMINE_MEMMAP_FRAMEBUFFER);
+    vmmMapEntryFlag(pmm_pml,LIMINE_MEMMAP_FRAMEBUFFER,PTE_PRESENT | PTE_WRITABLE);
     vmmMapEntry(pmm_pml,LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE);
     vmmMapKernel(pmm_pml);
     vmmMapSkipped(pmm_pml);
-    gfx_pml = phys2Virt(allocZeroPagePhys());
-    vmmMapKernel(gfx_pml);
-    vmmMapEntry(gfx_pml,LIMINE_MEMMAP_FRAMEBUFFER);
     vmmActivatePML(virt2Phys((uint64_t)kernel_pml));
     isVMMInitializied = 1;
 }

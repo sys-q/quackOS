@@ -63,10 +63,14 @@ void initPMM() {
     uint64_t pageCount = biggest_entry.length / PAGE_SIZE;
     uint64_t bitmapSize = (pageCount + 7) / 8;
     uint64_t bitmapPages = bitmapSize / PAGE_SIZE;
+        logPrintf("1\n");
     biggest_entry.bitmap = bitmapInit(bitmapSize);
+        logPrintf("1\n");
     biggest_entry.bitmap.pages_count = pageCount;
     biggest_entry.bitmap.next = bitmapPages + 1;
+        logPrintf("1\n");
     for(uint64_t i = 0;i < bitmapPages;i++) {
+            logPrintf("1\n");
         bitmapSetBit(&biggest_entry.bitmap,i);
     }
        

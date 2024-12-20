@@ -267,9 +267,17 @@ void initPMM();
 #define PTE_PRESENT (1 << 0)
 #define PTE_WRITABLE (1 << 1)
 #define PTE_USER (1 << 2)
+#define PTE_PWT (1 << 3)
+#define PTE_PCD (1 << 4)
+#define PTE_ACCESSED (1 << 5)
+#define PTE_DIRTY (1 << 6)
+#define PTE_PAT (1 << 7)
+#define PTE_GLOBAL (1 << 8)
+#define PTE_XD (1 << 63)
 #define PTE_KERNELFLAGS PTE_PRESENT | PTE_WRITABLE
 #define PTE_USERFLAGS PTE_PRESENT | PTE_WRITABLE | PTE_USER
 #define PTE_READONLYKERNEL PTE_PRESENT
+#define CACHE_MMIO (PTE_PWT)
 
 uint16_t vmmIndex(uint64_t virtual_address,uint8_t type);
 
@@ -278,6 +286,8 @@ void vmmMapPage(uint64_t* pml4,uint64_t phys,uint64_t virt,uint64_t flags);
 void vmmMapKernel(uint64_t* pml4);
 
 void vmmMapEntry(uint64_t* pml4,uint16_t type);
+
+void vmmMapEntryFlag(uint64_t* pml4,uint16_t type,uint64_t flag);
 
 void vmmMapBackBuffer(uint64_t* pml4);
 
@@ -294,6 +304,8 @@ uint64_t* vmmGetGFX();
 uint64_t* vmmGetKernel();
 
 void vmmSetBackbuffer(uint64_t i);
+
+void vmmPatSet(uint8_t idx, uint8_t type);
 
 char isVMMInit();
 

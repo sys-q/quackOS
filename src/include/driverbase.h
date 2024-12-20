@@ -22,6 +22,10 @@ void sti();
 void hlt();
 void outbwait();
 
+uint64_t rdmsr64(uint32_t msr);
+
+void wrmsr64(uint32_t msr, uint64_t value);
+
 uint64_t rdtsc();
 
 char* itoa(uint64_t value, char* str, int base );
