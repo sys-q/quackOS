@@ -12,6 +12,8 @@ static volatile struct limine_hhdm_request hhdm_request = {
     .revision = 0
 };
 
+
+
 void kmain(void) {
     initGop();
     textClearTextScreen();
@@ -41,10 +43,18 @@ void kmain(void) {
     vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel()));
     gopBackBuffer(phys2Virt(base_phys));
     textClearTextScreen();
-    logPrintf("Initializing PIT\n");
-    logPrintf("Backbuffer phys: 0x%p\n",base_phys);
+    logPrintf("PMM, Paging, GDT, IDT and Paging initializied successfuly !\n");
     logPrintf("Initializing PIT\n");
     initPIT(100);
+    cli();
+    textSetFG(0xFFFF00);
+    printf("\n\n                __\n");
+    printf("            ___( o)>\n");
+    printf("             \\ <_. )\n");
+    printf("              `---' \n\n");
+    printf("        Welcome to quackOS !\n\n\n");
+    textSetFG(0xFFFFFF);
+    sti();
     while(1) {
         hlt();
     }
