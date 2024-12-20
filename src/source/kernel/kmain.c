@@ -39,26 +39,13 @@ void kmain(void) {
     vmmSetBackbuffer(base_phys);
     vmmMapBackBuffer(vmmGetKernel());
     vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel()));
-    logPrintf("Initializing PIT\n");
     gopBackBuffer(phys2Virt(base_phys));
-    //gopDisableBackbuffer();
-    
-    gopClear(0);
+    textClearTextScreen();
+    logPrintf("Initializing PIT\n");
     logPrintf("Backbuffer phys: 0x%p\n",base_phys);
     logPrintf("Initializing PIT\n");
-    uint32_t fps = 0;
-    uint32_t last = 0;
-    last = cmosSecond();
-    while(true) {
-        gopSwap();
-        fps++;
-        gopPaint(randNum(0,gopGetWidth()),randNum(0,gopGetHeight()),randNum(0,0xFFFFFF));
-        if(last != cmosSecond()) {
-            last = cmosSecond();
-            textSetX(40,40*8);
-            textSetY(40,40*15);
-            printf("FPS: %d",fps);
-            fps = 0;
-        }
+    initPIT(100);
+    while(1) {
+        hlt();
     }
 }

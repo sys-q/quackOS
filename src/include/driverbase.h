@@ -37,3 +37,5 @@ uint64_t* phys2Virt(uint64_t address);
 void virtSetOffset(uint64_t ofset);
 
 extern void gsSwitch();
+
+void fpsTest();

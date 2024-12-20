@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "driverbase.h": "c"
+        "driverbase.h": "c",
+        "kernelapi.h": "c"
     }
 }

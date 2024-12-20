@@ -1,6 +1,8 @@
 #include <kernelapi.h>
 #include <driverbase.h>
+#include <variables.h>
 #include <stdint.h>
+
 
 uint64_t ticks;
 uint64_t pit_freq;
@@ -10,8 +12,8 @@ void pitHandler(uint16_t irq) {
     if(ticks % 10 == 0) {
         logPrintf("PIT: %d\n",ticks); 
     } 
-    if(ticks % 100 == 0 ) {
-        gopSwap(); 
+    if(ticks % (pit_freq / GOPFREQ) == 0) {
+        gopSwap();
     }
 }
 
