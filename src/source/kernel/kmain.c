@@ -54,6 +54,9 @@ void kmain(void) {
     printf("        Welcome to quackOS !\n\n\n");
     textSetFG(0xFFFFFF);
     while(1) {
-        hlt();
+        cmosWaitSecond();
+        logPrintf("Quack !\n");
+        cmosSleep(5);
+        logPrintf("Quack 5 !\n");
     }
 }
