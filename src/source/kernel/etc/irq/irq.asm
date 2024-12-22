@@ -3,7 +3,6 @@
 %macro pit_irq 1
 global pit_irq_%+%1
 pit_irq_%+%1:
-    cli
     jmp pitIRQ
 %endmacro
 

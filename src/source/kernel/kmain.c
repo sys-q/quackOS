@@ -16,7 +16,9 @@ void test() {
     logPrintf("1");
         logPrintf("Test !");
         gopSwap();
-    hlt();
+    while(1) {
+        
+    }
 }
 
 extern void testasm();
@@ -54,8 +56,9 @@ void kmain(void) {
     logPrintf("Initializing Scheduling\n");
     processQueue(100); // head
     processQueue((uint64_t)test);
+    processQueue((uint64_t)test);
     logPrintf("Initializing PIT\n");
-    initPIT(20);
+    initPIT(100);
     textSetFG(0xFFFF00);
     printf("\n\n                __\n");
     printf("            ___( o)>\n");
