@@ -50,9 +50,8 @@ contextSwitch:
     mov r15, [rdi + 128]
     mov [oldRAX], rax    
     mov rdi, [rdi + 56]
-    push qword [contextRIP]
     sti
-    ret
+    ret qword [contextRIP]
 
 dummyContext:
     times 18 dq 0
