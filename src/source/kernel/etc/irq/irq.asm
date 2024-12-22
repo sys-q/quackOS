@@ -3,6 +3,7 @@
 %macro pit_irq 1
 global pit_irq_%+%1
 pit_irq_%+%1:
+    cli
     jmp pitIRQ
 %endmacro
 
@@ -25,6 +26,6 @@ pitIRQ:
     jmp contextSwitch
 
  .end:
-    iretq
+    jmp pitIRQ
 
 pit_irq 32
