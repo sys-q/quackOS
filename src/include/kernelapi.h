@@ -250,6 +250,8 @@ uint64_t allocZeroPagePhys();
 
 uint64_t allocPages(uint64_t num_pages);
 
+uint64_t* pageToVirt(uint64_t page);
+
 void initPMM();
 
 // VMM
@@ -328,3 +330,47 @@ void irqSetupHandler(uint16_t vector, void (*func)(uint16_t));
 void initPIT(uint32_t freq);
 
 uint64_t pitCurrentTicks();
+
+// Scheduling
+
+#define PROCESS_FREE 0
+#define PROCESS_RUN 1
+
+typedef struct process_context {
+    uint64_t rip;
+    uint64_t rsp;
+    uint64_t rax;
+    uint64_t rbx;
+    uint64_t rcx;
+    uint64_t rdx;
+    uint64_t rsi;
+    uint64_t rdi;
+    uint64_t rbp;
+    uint64_t r8;
+    uint64_t r9;
+    uint64_t r10;
+    uint64_t r11;
+    uint64_t r12;
+    uint64_t r13;
+    uint64_t r14;
+    uint64_t r15;
+    uint64_t user;
+    uint64_t cr3;
+} process_context_t;
+
+typedef struct process {
+    uint64_t id;
+    uint8_t status;
+    process_context_t context;
+    struct process* next;
+} process_t;
+
+extern void contextSwitch(process_context_t* context);
+
+extern void contextSave(process_context_t* context);
+
+process_t* processCreate();
+
+void processQueue(uint64_t rip);
+
+void processWork(process_context_t* last_context);

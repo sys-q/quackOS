@@ -7,7 +7,7 @@
 uint64_t ticks;
 uint64_t pit_freq;
 
-void pitHandler(uint16_t irq) {
+void pitHandler(process_context_t* proc_ctx) {
     ticks++;
     if(ticks % 10 == 0) {
         logPrintf("PIT: %d\n",ticks); 
@@ -15,9 +15,12 @@ void pitHandler(uint16_t irq) {
     if(ticks % (pit_freq / GOPFREQ) == 0) {
         gopSwap();
     }
+    logPrintf("Test: 0x%p 0x%p 0x%p 0x%p 0x%p\n",proc_ctx->r15,proc_ctx->rip,proc_ctx->cr3,proc_ctx->rdi,proc_ctx->user);
+    gopSwap();
+    processWork(proc_ctx);
 }
 
-extern void irq_32();
+extern void pit_irq_32();
 
 uint64_t pitCurrentTicks() {
     return ticks;
@@ -29,7 +32,6 @@ void initPIT(uint32_t freq) {
     outb(0x43,0x36);
     outb(0x40,(uint8_t)(div & 0xFF));
     outb(0x40,(uint8_t)((div >> 8) & 0xFF));
-    idtSetDescriptor(32,irq_32,0x8E);
-    irqSetupHandler(32,pitHandler);
+    idtSetDescriptor(32,pit_irq_32,0x8E);
     picClearMask(0);
 }

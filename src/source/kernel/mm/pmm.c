@@ -170,6 +170,10 @@ uint64_t allocPages(uint64_t num_pages) {
     return 0;
 }
 
+uint64_t* pageToVirt(uint64_t page) {
+    return phys2Virt((page * PAGE_SIZE) + biggest_entry.base);
+}
+
 uint64_t sizeToPages(uint64_t size) {
     uint64_t pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
     if(size > PAGE_SIZE - 10)

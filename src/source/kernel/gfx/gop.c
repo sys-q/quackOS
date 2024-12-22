@@ -76,6 +76,7 @@ void gopBackBuffer(uint32_t* backbuffer) {
 }
 
 void gopSwap() {
+    vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
     if(gopBackBufferState) 
         memcpy(gopFrameBufferBase,gopBackBufferBase,gopHeight*gopPitch);
 }

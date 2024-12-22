@@ -12,7 +12,14 @@ static volatile struct limine_hhdm_request hhdm_request = {
     .revision = 0
 };
 
+void test() {
+    logPrintf("1");
+        logPrintf("Test !");
+        gopSwap();
+    hlt();
+}
 
+extern void testasm();
 
 void kmain(void) {
     initGop();
@@ -44,8 +51,11 @@ void kmain(void) {
     gopBackBuffer(phys2Virt(base_phys));
     textClearTextScreen();
     logPrintf("PMM, Paging, GDT, IDT and BackBuffer initializied successfuly !\n");
+    logPrintf("Initializing Scheduling\n");
+    processQueue(100); // head
+    processQueue((uint64_t)test);
     logPrintf("Initializing PIT\n");
-    initPIT(100);
+    initPIT(20);
     textSetFG(0xFFFF00);
     printf("\n\n                __\n");
     printf("            ___( o)>\n");
@@ -53,6 +63,7 @@ void kmain(void) {
     printf("              `---' \n\n");
     printf("        Welcome to quackOS !\n\n\n");
     textSetFG(0xFFFFFF);
+    //gopSwap();
     while(1) {
         cmosWaitSecond();
         logPrintf("Quack !\n");
