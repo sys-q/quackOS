@@ -12,16 +12,24 @@ static volatile struct limine_hhdm_request hhdm_request = {
     .revision = 0
 };
 
+
 void test() {
-    logPrintf("1");
-        logPrintf("Test !");
-        gopSwap();
-    while(1) {
-        
+    printf("Entering to task 1\n");
+    while (1)
+    {
+        printf("1");
+        hlt();
     }
+    
 }
 
-extern void testasm();
+void test2() {
+    printf("Entering to task 2 0x%p\n",test2);
+    while(1) {
+        printf("2");
+        hlt();
+    }
+}
 
 void kmain(void) {
     initGop();
@@ -34,6 +42,7 @@ void kmain(void) {
     initGDT();
     logPrintf("Initializing IDT\n");
     initIDT();
+    disasmInit();
     logPrintf("Initializing PIC\n");
     picRemap();
     virtSetOffset(hhdm_request.response->offset);
@@ -56,9 +65,10 @@ void kmain(void) {
     logPrintf("Initializing Scheduling\n");
     processQueue(100); // head
     processQueue((uint64_t)test);
-    processQueue((uint64_t)test);
+    processQueue((uint64_t)test2);
     logPrintf("Initializing PIT\n");
-    initPIT(100);
+    cli();
+    initPIT(20);
     textSetFG(0xFFFF00);
     printf("\n\n                __\n");
     printf("            ___( o)>\n");
@@ -66,11 +76,8 @@ void kmain(void) {
     printf("              `---' \n\n");
     printf("        Welcome to quackOS !\n\n\n");
     textSetFG(0xFFFFFF);
-    //gopSwap();
+    sti();
     while(1) {
-        cmosWaitSecond();
-        logPrintf("Quack !\n");
-        cmosSleep(5);
-        logPrintf("Quack 5 !\n");
+        hlt();
     }
 }

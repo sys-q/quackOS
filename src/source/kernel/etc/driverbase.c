@@ -41,6 +41,16 @@ void *memmove(void *dest, const void *src, size_t n) {
     return dest;
 }
 
+int16_t strcmp(const char *str1, const char *str2) {
+    while (*str1 && *str2 && *str1 == *str2) {
+        if(*str1 == '\0')
+            return 0;
+        str1++;
+        str2++;
+    }
+    return *str1 - *str2;
+}
+
 uint64_t rdmsr64(uint32_t msr) {
     uint32_t lo, hi;
     __asm__ volatile ("rdmsr" : "=a"(lo), "=d"(hi) : "c"(msr));
@@ -85,6 +95,29 @@ void sti() {
 void hlt() {
     __asm__ volatile ("hlt");
 }
+
+uint64_t rflags() {
+    uint64_t rflags;
+    __asm__ volatile (
+        "pushfq\n\t"      // Сохраняем RFLAGS на стек
+        "pop %0"          // Извлекаем значение из стека в переменную
+        : "=r" (rflags)   // Выходной операнд
+    );
+    return rflags;        // Возвращаем сохраненное значение RFLAGS
+}
+
+uint64_t cs() {
+    uint64_t cs;
+    asm volatile("mov %%cs, %0" : : "r" ((uint64_t)cs) : "memory");
+    return cs;        // Возвращаем сохраненное значение RFLAGS
+}
+
+uint64_t ss() {
+    uint64_t ss;
+    asm volatile("mov %%ss, %0" : : "r" ((uint64_t)ss) : "memory");
+    return ss;        // Возвращаем сохраненное значение RFLAGS
+}
+
 
 uint64_t rdtsc() {
     uint32_t lo, hi;

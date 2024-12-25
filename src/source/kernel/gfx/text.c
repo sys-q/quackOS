@@ -12,7 +12,7 @@ uint32_t charForeGround;
 uint32_t textScreenX = 0;
 uint32_t textScreenY = 0;
 uint8_t fontSizeX = 8;
-uint8_t fontSizeY = 15;
+uint8_t fontSizeY = 16;
 
 void textDrawChar(int xOffset, int yOffset, uint32_t color, char ch) {
     int firstByteIdx = ch * 16;
@@ -93,8 +93,8 @@ void textClearChar(int x, int y){
 }
 
 void textClearCharGFX(int x, int y){
-    for (int by = 0; by < 16; by++) { 
-        for (int bi = 0; bi < 8; bi++) {
+    for (uint32_t by = 0; by < 16; by++) { 
+        for (uint32_t bi = 0; bi < 8; bi++) {
             gopPaint(x + bi, y + by, charBackGround);
         }
     }

@@ -29,7 +29,6 @@ char* exceptions[] = {
 };
 
 void freezeKernel() {
-    cli();
     while(1) {
         hlt();
     }
@@ -56,8 +55,15 @@ uint64_t saveCR2() {
     return cr2;
 }
 
+uint8_t isPanic = 0;
 
 void exceptionHandler(struct interrupt_frame frame) {
+    cli();
+    if(isPanic) {
+        printf(" Fault function : NOT RESOLVED\n");
+        freezeKernel();
+    } 
+    isPanic = 1;
     gopFastEnable();
     gopDisableBackbuffer();
     textSetBG(0);
@@ -75,6 +81,7 @@ void exceptionHandler(struct interrupt_frame frame) {
     printf(" RIP: 0x%p    SS: 0x%p     ERR: 0x%p    CS: 0x%p     RFLAGS: 0x%p\n",frame.rip,frame.ss,frame.error_code,frame.cs,frame.rflags);
     printf(" RSP: 0x%p    VEC: 0x%p    CR2: 0x%p     Exception: 0x%p\n",frame.rsp,frame.vec,saveCR2(),frame.r15);
     printf(" Text: %s\n",exceptions[frame.r15]);
+    printf(" Fault function: %s()",disasmFunctionName(frame.rip));
 
     freezeKernel();
 }

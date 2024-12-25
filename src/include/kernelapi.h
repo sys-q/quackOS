@@ -207,6 +207,34 @@ void initIDT();
 
 void loadIDT();
 
+// Disassembler
+
+struct elfSectHeader {
+    uint32_t name;
+    uint32_t type;
+    uint64_t flags;
+    uint64_t address;
+    uint64_t offset;
+    uint64_t size;
+    uint32_t link;
+    uint32_t info;
+    uint64_t address_align;
+    uint64_t entry_size;
+} __attribute__ ((packed));
+
+struct elfSymtabEntry {
+    uint32_t name;
+    uint8_t info;
+    uint8_t other;
+    uint16_t idx;
+    uint64_t value;
+    uint64_t size;
+} __attribute__ ((packed));
+
+void disasmInit();
+
+char* disasmFunctionName(uint64_t rip);
+
 // PMM
 
 typedef struct {
@@ -325,10 +353,7 @@ void picClearMask(uint8_t irq);
 
 void irqSetupHandler(uint16_t vector, void (*func)(uint16_t));
 
-// PIT
-
-void initPIT(uint32_t freq);
-
+// PITuint64_t rflags() {
 uint64_t pitCurrentTicks();
 
 // Scheduling
@@ -338,13 +363,17 @@ uint64_t pitCurrentTicks();
 
 typedef struct process_context {
     uint64_t rip;
+    uint64_t cs;
+    uint64_t rflags;
     uint64_t rsp;
+    uint64_t ss;
     uint64_t rax;
+    uint64_t rdi;
+    uint64_t cr3;
     uint64_t rbx;
     uint64_t rcx;
     uint64_t rdx;
     uint64_t rsi;
-    uint64_t rdi;
     uint64_t rbp;
     uint64_t r8;
     uint64_t r9;
@@ -354,9 +383,7 @@ typedef struct process_context {
     uint64_t r13;
     uint64_t r14;
     uint64_t r15;
-    uint64_t user;
-    uint64_t cr3;
-} process_context_t;
+} __attribute__ ((packed)) process_context_t;
 
 typedef struct process {
     uint64_t id;
@@ -364,10 +391,6 @@ typedef struct process {
     process_context_t context;
     struct process* next;
 } process_t;
-
-extern void contextSwitch(process_context_t* context);
-
-extern void contextSave(process_context_t* context);
 
 process_t* processCreate();
 

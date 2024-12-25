@@ -7,16 +7,15 @@
 uint64_t ticks;
 uint64_t pit_freq;
 
+void pitTick() {
+    ticks++;
+}
+
 void pitHandler(process_context_t* proc_ctx) {
     ticks++;
-    if(ticks % 10 == 0) {
-        logPrintf("PIT: %d\n",ticks); 
-    } 
     if(ticks % (pit_freq / GOPFREQ) == 0) {
         gopSwap();
     }
-    logPrintf("Test: 0x%p 0x%p 0x%p 0x%p 0x%p\n",proc_ctx->r15,proc_ctx->rip,proc_ctx->cr3,proc_ctx->rdi,proc_ctx->user);
-    gopSwap();
     processWork(proc_ctx);
 }
 
