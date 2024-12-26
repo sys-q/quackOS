@@ -15,6 +15,9 @@ dummyContext:
 extern pitHandler
 extern processMainPaging
 pitIRQ:
+
+.continue0
+
     cmp qword [rsp + 8],0x08
     jz .continue
     swapgs
@@ -61,6 +64,11 @@ pitIRQ:
     mov ax,0x20
     out 0x20,ax
 
+    cmp qword [rdi + 8],0x08
+    jz .continue2
+    swapgs
+
+.continue2:
     mov rax,[rdi + 56]
     mov cr3,rax
     mov rax,[rdi + 40]
@@ -82,6 +90,10 @@ pitIRQ:
 
  .end:
     jmp pitIRQ
+
+global dummyIRQ
+dummyIRQ:
+    iretq
 
 pit_irq 32
 

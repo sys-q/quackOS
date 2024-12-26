@@ -12,6 +12,7 @@ static volatile struct limine_hhdm_request hhdm_request = {
     .revision = 0
 };
 
+int test1 = 0;
 
 void test() {
     printf("Entering to task 1\n");
@@ -23,9 +24,12 @@ void test() {
     
 }
 
+int test3 = 0;
+
 void test2() {
     printf("Entering to task 2 0x%p\n",test2);
     while(1) {
+        
         printf("2");
         hlt();
     }
@@ -35,7 +39,7 @@ void kmain(void) {
     initGop();
     textClearTextScreen();
     kernelInitTextMode();
-    gopFastEnable();
+    gopFastDisable();
     textSetBG(0x05);
     textClearTextScreen();
     logPrintf("Initializing GDT\n");
@@ -67,8 +71,7 @@ void kmain(void) {
     processQueue((uint64_t)test);
     processQueue((uint64_t)test2);
     logPrintf("Initializing PIT\n");
-    cli();
-    initPIT(20);
+    initPIT(1000);
     textSetFG(0xFFFF00);
     printf("\n\n                __\n");
     printf("            ___( o)>\n");
@@ -76,7 +79,7 @@ void kmain(void) {
     printf("              `---' \n\n");
     printf("        Welcome to quackOS !\n\n\n");
     textSetFG(0xFFFFFF);
-    sti();
+    scheduling_unlock();
     while(1) {
         hlt();
     }

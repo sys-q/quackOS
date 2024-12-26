@@ -159,7 +159,7 @@ void initVMM() {
     vmmMapKernel(kernel_pml);
     pmm_pml = phys2Virt(allocZeroPagePhys());
     vmmMapEntry(pmm_pml,LIMINE_MEMMAP_USABLE);
-    vmmMapEntryFlag(pmm_pml,LIMINE_MEMMAP_FRAMEBUFFER,PTE_PRESENT | PTE_WRITABLE);
+    vmmMapEntryFlag(pmm_pml,LIMINE_MEMMAP_FRAMEBUFFER,PTE_PRESENT | PTE_WRITABLE | CACHE_MMIO);
     vmmMapEntry(pmm_pml,LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE);
     vmmMapKernel(pmm_pml);
     vmmMapSkipped(pmm_pml);

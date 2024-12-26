@@ -12,6 +12,7 @@ void pitTick() {
 }
 
 void pitHandler(process_context_t* proc_ctx) {
+    scheduling_lock();
     ticks++;
     if(ticks % (pit_freq / GOPFREQ) == 0) {
         gopSwap();
@@ -32,5 +33,4 @@ void initPIT(uint32_t freq) {
     outb(0x40,(uint8_t)(div & 0xFF));
     outb(0x40,(uint8_t)((div >> 8) & 0xFF));
     idtSetDescriptor(32,pit_irq_32,0x8E);
-    picClearMask(0);
 }

@@ -46,6 +46,14 @@ void processQueue(uint64_t rip) {
     last = proc;
 }
 
+void scheduling_lock() {
+    picSetMask(0);
+}
+
+void scheduling_unlock() {
+    picClearMask(0);
+}
+
 void processWork(process_context_t* last_context) {
 
     current->context.rip = last_context->rip;
@@ -74,6 +82,7 @@ void processWork(process_context_t* last_context) {
             current = head;
     if(current->next->status != PROCESS_FREE) {
            asm volatile("mov %0, %%r15" : : "r" ((uint64_t)&current->next->context) : "memory");
+           scheduling_unlock();
                    current = current->next;
            return;
     }

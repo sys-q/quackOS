@@ -397,3 +397,7 @@ process_t* processCreate();
 void processQueue(uint64_t rip);
 
 void processWork(process_context_t* last_context);
+
+void scheduling_lock();
+
+void scheduling_unlock();

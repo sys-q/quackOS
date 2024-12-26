@@ -51,12 +51,7 @@ void loadIDT() {
     asm volatile("sti");
 }
 
-void dummyHandler() {
-    logPrintf("Dummy\n");
-    gopSwap();
-    cli();
-    hlt();
-}
+extern void dummyIRQ();
 
 void initIDT() {
     idtr.base = (uint64_t)&idt[0];
@@ -66,7 +61,7 @@ void initIDT() {
         vectors[index] = 1;
     }
     for(uint8_t index = 32;index < 40;index++) {
-        idtSetDescriptor(index,dummyHandler,0x8E);
+        idtSetDescriptor(index,dummyIRQ,0x8E);
         vectors[index] = 1;
     }
     loadIDT();

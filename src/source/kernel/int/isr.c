@@ -59,11 +59,13 @@ uint8_t isPanic = 0;
 
 void exceptionHandler(struct interrupt_frame frame) {
     cli();
+
     if(isPanic) {
         printf(" Fault function : NOT RESOLVED\n");
         freezeKernel();
     } 
     isPanic = 1;
+    textClearTextScreen();
     gopFastEnable();
     gopDisableBackbuffer();
     textSetBG(0);
