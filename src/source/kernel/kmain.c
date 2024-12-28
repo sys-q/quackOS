@@ -12,28 +12,17 @@ static volatile struct limine_hhdm_request hhdm_request = {
     .revision = 0
 };
 
-int test1 = 0;
-
 void test() {
-    printf("Entering to task 1\n");
     while (1)
     {
         printf("1");
         hlt();
+
     }
     
 }
 
-int test3 = 0;
-
-void test2() {
-    printf("Entering to task 2 0x%p\n",test2);
-    while(1) {
-        
-        printf("2");
-        hlt();
-    }
-}
+void kmain_task();
 
 void kmain(void) {
     initGop();
@@ -67,11 +56,30 @@ void kmain(void) {
     textClearTextScreen();
     logPrintf("PMM, Paging, GDT, IDT and BackBuffer initializied successfuly !\n");
     logPrintf("Initializing Scheduling\n");
-    processQueue(100); // head
-    processQueue((uint64_t)test);
-    processQueue((uint64_t)test2);
+    processQueue(1,0); // head
+        
+    process_t* kernel_init_task = processQueue((uint64_t)kmain_task,0);
+    kernel_init_task->context.cr3 = (uint64_t)virt2Phys((uint64_t)vmmGetKernel());
+    for(uint64_t i = ALIGNPAGEDOWN((uint64_t)virt2Phys(kernel_init_task->context.rsp));i < (256 * PAGE_SIZE) + ALIGNPAGEUP((uint64_t)virt2Phys(kernel_init_task->context.rsp));i += PAGE_SIZE) {
+        vmmMapPage(vmmGetKernel(),i,(uint64_t)phys2Virt(i),PTE_PRESENT | PTE_WRITABLE);
+    }
+    vmmMapPage(vmmGetKernel(),(uint64_t)virt2Phys((uint64_t)kernel_init_task),(uint64_t)kernel_init_task,PTE_PRESENT | PTE_WRITABLE);
+    processQueue((uint64_t)test,0);
+    gopSwap();
     logPrintf("Initializing PIT\n");
     initPIT(1000);
+
+    scheduling_unlock();    
+    while(1) {
+        hlt();
+    }
+}
+
+
+void kmain_task() {
+    scheduling_lock();
+    logPrintf("Initializing ACPI\n");
+    //initACPI();
     textSetFG(0xFFFF00);
     printf("\n\n                __\n");
     printf("            ___( o)>\n");

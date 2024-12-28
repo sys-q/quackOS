@@ -59,6 +59,7 @@ uint8_t isPanic = 0;
 
 void exceptionHandler(struct interrupt_frame frame) {
     cli();
+    scheduling_lock();
 
     if(isPanic) {
         printf(" Fault function : NOT RESOLVED\n");

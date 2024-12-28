@@ -387,17 +387,24 @@ typedef struct process_context {
 
 typedef struct process {
     uint64_t id;
+    uint64_t start_rsp;
     uint8_t status;
     process_context_t context;
     struct process* next;
 } process_t;
 
-process_t* processCreate();
+process_t* processCreate(uint64_t paging_flags);
 
-void processQueue(uint64_t rip);
+process_t* processQueue(uint64_t rip,uint8_t is_user);
 
 void processWork(process_context_t* last_context);
 
 void scheduling_lock();
 
 void scheduling_unlock();
+
+process_t* current_process();
+
+// ACPI
+
+void initACPI();

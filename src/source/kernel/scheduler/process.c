@@ -10,7 +10,11 @@ uint64_t last_id;
 uint64_t process_count;
 uint64_t process_ticks;
 
-process_t* processCreate() {
+process_t* current_process() {
+    return current;
+}
+
+process_t* processCreate(uint64_t paging_flags) {
     process_t* proc = (process_t*)phys2Virt(allocZeroPagePhys());
     proc->status = PROCESS_RUN;
     proc->next = 0;
@@ -23,19 +27,64 @@ process_t* processCreate() {
     uint64_t* virtcr3 = phys2Virt(proc->context.cr3);
     vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
     vmmMapKernel(virtcr3);
-    uint64_t flags = PTE_PRESENT | PTE_WRITABLE;
     for(uint64_t i = ALIGNPAGEDOWN((uint64_t)virt2Phys(proc->context.rsp));i < (256 * PAGE_SIZE) + ALIGNPAGEUP((uint64_t)virt2Phys(proc->context.rsp));i += PAGE_SIZE) {
-        vmmMapPage(virtcr3,i,(uint64_t)phys2Virt(i),flags);
+        vmmMapPage(virtcr3,i,(uint64_t)phys2Virt(i),paging_flags);
     }
     vmmMapBackBuffer(virtcr3);
-    vmmMapPage(virtcr3,(uint64_t)virt2Phys((uint64_t)proc),(uint64_t)proc,flags);
+    vmmMapPage(virtcr3,(uint64_t)virt2Phys((uint64_t)proc),(uint64_t)proc,paging_flags);
     //vmmMapEntry(virtcr3,LIMINE_MEMMAP_USABLE);
     last_id++;
     return proc;
 }
 
-void processQueue(uint64_t rip) {
-    process_t* proc = processCreate();
+process_t* processQueue(uint64_t rip,uint8_t is_user) {
+    process_t* proc = head;
+    while(1) {
+        
+        if(proc == 0 || proc == proc->next) {
+            break;
+        } else {    
+            uint8_t usercs = 0x18 | 3;
+
+            if(proc->status == PROCESS_FREE) {
+                if(proc->context.cs == usercs && is_user) {
+                    memset((uint64_t*)proc->start_rsp,0,256 * PAGE_SIZE);
+                    uint64_t old_cr3 = proc->context.cr3;
+                    memset(&proc->context,0,sizeof(process_context_t));
+                    proc->context.cr3 = old_cr3;
+                    proc->context.cs = 0x18 | 3;
+                    proc->context.ss = 0x20 | 3;
+                    proc->context.rflags = rflags();
+                    proc->context.rip = rip;
+                    proc->status = PROCESS_RUN;
+                    proc->context.rsp = proc->start_rsp;
+                    return proc;
+                } else if(proc->context.cs != usercs && !is_user) {
+                    memset((uint64_t*)proc->start_rsp,0,256 * PAGE_SIZE);
+                    uint64_t old_cr3 = proc->context.cr3;
+                    memset(&proc->context,0,sizeof(process_context_t));
+                    proc->context.cr3 = old_cr3;
+                    proc->context.cs = 0x08;
+                    proc->context.ss = 0x10;
+                    proc->context.rflags = rflags();
+                    proc->context.rip = rip;
+                    proc->status = PROCESS_RUN;
+                    proc->context.rsp = proc->start_rsp;
+                    return proc;
+                }    
+            }    
+        } 
+        proc = proc->next;  
+         
+    }    
+        
+    if(is_user) {
+        proc = processCreate(PTE_PRESENT | PTE_WRITABLE | PTE_USER);
+        proc->context.cs = 0x18 | 3;
+        proc->context.ss = 0x20 | 3;
+    } else {
+        proc = processCreate(PTE_PRESENT | PTE_WRITABLE);
+    }
     if(proc->id == 0) {
         last = proc;
         current = proc;
@@ -44,6 +93,8 @@ void processQueue(uint64_t rip) {
     proc->context.rip = rip;
     last->next = proc;
     last = proc;
+    
+    return proc;
 }
 
 void scheduling_lock() {
@@ -56,27 +107,10 @@ void scheduling_unlock() {
 
 void processWork(process_context_t* last_context) {
 
-    current->context.rip = last_context->rip;
-    current->context.cs = last_context->cs;
-    current->context.rflags = last_context->rflags;
-    current->context.rsp = last_context->rsp;
-    current->context.ss = last_context->ss;
-    current->context.rax = last_context->rax;
-    current->context.rdi = last_context->rdi;
-    current->context.cr3 = last_context->cr3;
-    current->context.rbx = last_context->rbx;
-    current->context.rdx = last_context->rdx;
-    current->context.rsi = last_context->rsi;
-    current->context.rbp = last_context->rbp;
-    current->context.r8 = last_context->r8;
-    current->context.r9 = last_context->r9;
-    current->context.r10 = last_context->r10;
-    current->context.r11 = last_context->r11;
-    current->context.r12 = last_context->r12;
-    current->context.r13 = last_context->r13;
-    current->context.r14 = last_context->r14;
-    current->context.r15 = last_context->r15;
+    
+    memcpy(&current->context,last_context,sizeof(process_context_t));
 
+    
 
     if(current->next == 0)
             current = head;
