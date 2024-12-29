@@ -76,7 +76,7 @@ static uacpi_status initialize_fixed_events(void)
             fixed_events[i].enable_field, UACPI_EVENT_DISABLED
         );
     }
-
+    
     return UACPI_STATUS_OK;
 }
 
@@ -2113,7 +2113,7 @@ uacpi_status uacpi_initialize_events_early(void)
     g_gpe_state_slock = uacpi_kernel_create_spinlock();
     if (uacpi_unlikely(g_gpe_state_slock == UACPI_NULL))
         return UACPI_STATUS_OUT_OF_MEMORY;
-
+    
     ret = uacpi_recursive_lock_init(&g_event_lock);
     if (uacpi_unlikely_error(ret))
         return ret;

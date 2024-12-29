@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdatomic.h>
 #include <limine.h>
 
 // GOP
@@ -203,6 +204,10 @@ void exceptionHandler(struct interrupt_frame frame);
 
 void idtSetDescriptor(uint8_t index,void* isr,uint8_t flags);
 
+uint8_t allocIRQ();
+
+void freeIRQ(uint8_t index);
+
 void initIDT();
 
 void loadIDT();
@@ -339,6 +344,24 @@ void vmmPatSet(uint8_t idx, uint8_t type);
 
 char isVMMInit();
 
+// Page heap
+
+typedef struct kernel_heap_block {
+    size_t size;
+    uint8_t isfree;
+    struct kernel_heap_block* next;
+} kernel_heap_block_t;
+
+
+void initHeapPage(size_t page);
+
+void initMultiHeapPage(size_t page,size_t page_count);
+
+void* pageMalloc(size_t page,size_t size);
+
+void pageFree(void* ptr);
+
+
 // PIC
 
 void picRemap();
@@ -405,6 +428,14 @@ void scheduling_unlock();
 
 process_t* current_process();
 
+// Spinlock
+
+void spinlock_lock(atomic_flag *lock);
+
+void spinlock_unlock(atomic_flag* lock);
+
 // ACPI
 
 void initACPI();
+
+void initUACPIHeap();

@@ -34,7 +34,7 @@ void* isr_table[32] = {
 
 static idt_entry_t idt[256];
 static idtr_t idtr;
-static int vectors[256];
+uint8_t vectors[256];
 
 void idtSetDescriptor(uint8_t index,void* isr,uint8_t flags) {
     idt[index].baselow = (uint64_t)isr & 0xFFFF;
@@ -44,6 +44,7 @@ void idtSetDescriptor(uint8_t index,void* isr,uint8_t flags) {
     idt[index].basemid = ((uint64_t)isr >> 16) & 0xFFFF;
     idt[index].basehigh = ((uint64_t)isr >> 32) & 0xFFFFFFFF;
     idt[index].reserved0 = 0;
+    vectors[index] = 1;
 }
 
 void loadIDT() {
@@ -52,6 +53,18 @@ void loadIDT() {
 }
 
 extern void dummyIRQ();
+
+uint8_t allocIRQ() {
+    for(uint8_t index = 32;index < 256;index++) {
+        if(!vectors[index])
+            return index;
+    }
+}
+
+void freeIRQ(uint8_t index) {
+    idtSetDescriptor(index,dummyIRQ,0x8E);
+    vectors[index] = 0;
+}
 
 void initIDT() {
     idtr.base = (uint64_t)&idt[0];
@@ -62,7 +75,8 @@ void initIDT() {
     }
     for(uint8_t index = 32;index < 40;index++) {
         idtSetDescriptor(index,dummyIRQ,0x8E);
-        vectors[index] = 1;
+        vectors[index] = 0; // dummy 
     }
+    vectors[0x80] = 1; // reserve int 0x80
     loadIDT();
 }

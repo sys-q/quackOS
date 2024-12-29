@@ -3,15 +3,15 @@
 #include <driverbase.h>
 
 
-void (*vectors[0xFFFF - 1])(uint16_t) = {
+void (*vectorss[0xFFFF - 1])(uint16_t) = {
 
 };
 
 void irqSetupHandler(uint16_t vector, void (*func)(uint16_t)) {
-    vectors[vector] = func;
+    vectorss[vector] = func;
 }
 
 void irqHandler(uint16_t irq) {
-   vectors[irq](irq);
+   vectorss[irq](irq);
    picEOI(irq);
 }

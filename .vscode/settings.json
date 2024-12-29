@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "driverbase.h": "c",
-        "kernelapi.h": "c"
+        "kernelapi.h": "c",
+        "stdatomic.h": "c"
     }
 }

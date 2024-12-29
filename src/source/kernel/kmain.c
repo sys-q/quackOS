@@ -79,7 +79,9 @@ void kmain(void) {
 void kmain_task() {
     scheduling_lock();
     logPrintf("Initializing ACPI\n");
-    //initACPI();
+    gopSwap();
+    initACPI();
+    
     textSetFG(0xFFFF00);
     printf("\n\n                __\n");
     printf("            ___( o)>\n");
