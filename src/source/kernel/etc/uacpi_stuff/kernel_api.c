@@ -222,14 +222,12 @@ void uacpi_kernel_free_spinlock(uacpi_handle handle) {
 }
 
 uacpi_cpu_flags uacpi_kernel_lock_spinlock(uacpi_handle lock) {
-    cli();
     spinlock_lock((atomic_flag*)lock);
     return 1;
 }
 
 void uacpi_kernel_unlock_spinlock(uacpi_handle lock, uacpi_cpu_flags) {
     spinlock_unlock((atomic_flag*)lock);
-    sti();
 }
 
 uacpi_status uacpi_kernel_schedule_work(
