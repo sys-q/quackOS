@@ -71,7 +71,7 @@ void exceptionHandler(struct interrupt_frame frame) {
     gopDisableBackbuffer();
     textSetBG(0);
     textSetFG(0xFFFFFF);
-    vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
+    vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel()));
     //textClearTextScreen();
     printDuck();
     textSetX(25,24*getFontSizeX());

@@ -63,14 +63,10 @@ void initPMM() {
     uint64_t pageCount = biggest_entry.length / PAGE_SIZE;
     uint64_t bitmapSize = (pageCount + 7) / 8;
     uint64_t bitmapPages = bitmapSize / PAGE_SIZE;
-        logPrintf("1\n");
     biggest_entry.bitmap = bitmapInit(bitmapSize);
-        logPrintf("1\n");
     biggest_entry.bitmap.pages_count = pageCount;
     biggest_entry.bitmap.next = bitmapPages + 1;
-        logPrintf("1\n");
     for(uint64_t i = 0;i < bitmapPages;i++) {
-            logPrintf("1\n");
         bitmapSetBit(&biggest_entry.bitmap,i);
     }
        
@@ -85,10 +81,7 @@ void pmmMapPage(uint64_t cr3_phys,uint64_t page,uint64_t flags) {
 
 uint64_t allocPage() {
     uint64_t old_cr3;
-    if(isVMMInit()) {
-        asm volatile ("mov %%cr3, %0" : "=r"(old_cr3));
-        vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
-    }
+    asm volatile ("mov %%cr3, %0" : "=r"(old_cr3));
     uint64_t next_page = biggest_entry.bitmap.next;
     if(next_page != 0) {
         if(!bitmapIsBitSet(&biggest_entry.bitmap,next_page))
@@ -97,8 +90,6 @@ uint64_t allocPage() {
             biggest_entry.bitmap.next++;
             biggest_entry.bitmap.pages_count++;
             pmmMapPage(old_cr3,next_page,PTE_KERNELFLAGS);
-            if(isVMMInit())
-                vmmActivatePML((uint64_t*)old_cr3);
             return next_page;
         }
         else 
@@ -112,8 +103,6 @@ uint64_t allocPage() {
             bitmapSetBit(&biggest_entry.bitmap,i);
             biggest_entry.bitmap.pages_count++;
             pmmMapPage(old_cr3,i,PTE_KERNELFLAGS);
-            if(isVMMInit())
-                vmmActivatePML((uint64_t*)old_cr3);
             return i;
         }
     }
@@ -122,15 +111,8 @@ uint64_t allocPage() {
 }
 
 void freePage(uint64_t page) {
-    uint64_t old_cr3;
-    if(isVMMInit()) {
-        asm volatile ("mov %%cr3, %0" : "=r"(old_cr3));
-        vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
-    }
     bitmapClearBit(&biggest_entry.bitmap,page);
     biggest_entry.bitmap.pages_count--;
-    if(isVMMInit())
-        vmmActivatePML((uint64_t*)old_cr3);
 }
 
 uint64_t allocZeroPage() {
@@ -145,11 +127,6 @@ uint64_t allocZeroPagePhys() {
 }
 
 uint64_t allocPages(uint64_t num_pages) {
-    uint64_t old_cr3;
-    if (isVMMInit()) {
-        asm volatile ("mov %%cr3, %0" : "=r"(old_cr3));
-        vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
-    }
     uint64_t start_page = biggest_entry.bitmap.next;
     uint64_t allocated_count = 0;
     for (uint64_t i = start_page; i < biggest_entry.bitmap.pages_count; i++) {
@@ -158,8 +135,6 @@ uint64_t allocPages(uint64_t num_pages) {
             bitmapSetBit(&biggest_entry.bitmap, i);
             if (allocated_count == num_pages) {
                 biggest_entry.bitmap.next = i + 1; 
-                if (isVMMInit())
-                    vmmActivatePML((uint64_t*)old_cr3);
                 return start_page;
             }
         } else {

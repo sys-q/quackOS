@@ -110,13 +110,14 @@ void vmmMapSkipped(uint64_t* pml4) {
     }
 }
 
+// its deprecated function
 uint64_t* vmmGetPMM() {
-    return pmm_pml;
+    return kernel_pml;
 }
 
 uint64_t* gfx_pml;
 
-// idk
+// its deprecated too
 uint64_t* vmmGetGFX() {
     return 0;
 }
@@ -155,14 +156,8 @@ void initVMM() {
     kernel_pml = phys2Virt(allocZeroPagePhys());
     vmmMapEntryFlag(kernel_pml,LIMINE_MEMMAP_FRAMEBUFFER,PTE_PRESENT | PTE_WRITABLE | CACHE_MMIO);
     vmmMapEntry(kernel_pml,LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE);
-    vmmMapSkipped(kernel_pml);
+    vmmMapEntry(kernel_pml,LIMINE_MEMMAP_USABLE);
     vmmMapKernel(kernel_pml);
-    pmm_pml = phys2Virt(allocZeroPagePhys());
-    vmmMapEntry(pmm_pml,LIMINE_MEMMAP_USABLE);
-    vmmMapEntryFlag(pmm_pml,LIMINE_MEMMAP_FRAMEBUFFER,PTE_PRESENT | PTE_WRITABLE | CACHE_MMIO);
-    vmmMapEntry(pmm_pml,LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE);
-    vmmMapKernel(pmm_pml);
-    vmmMapSkipped(pmm_pml);
     vmmActivatePML(virt2Phys((uint64_t)kernel_pml));
     isVMMInitializied = 1;
 }

@@ -124,6 +124,6 @@ void processWork(process_context_t* last_context) {
 }
 
 void processMainPaging() {
-    vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
+    vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel())); // enable kernel paging
     return;
 }

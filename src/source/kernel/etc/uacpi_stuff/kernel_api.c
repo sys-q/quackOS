@@ -22,11 +22,6 @@ uint64_t uacpi_heap;
 
 void initUACPIHeap() {
     uacpi_heap = allocPages(2048); // 8 MB
-    vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
-    for(uint64_t i = uacpi_heap;i < uacpi_heap + 2048;i++) {
-        vmmMapPage(vmmGetKernel(),(uint64_t)virt2Phys((uint64_t)pageToVirt(i)),(uint64_t)pageToVirt(i),PTE_PRESENT | PTE_WRITABLE);
-    }
-    vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel()));
     initMultiHeapPage(uacpi_heap,2048);
 }
 
@@ -106,12 +101,10 @@ uacpi_status uacpi_kernel_io_write(
 }
 
 void *uacpi_kernel_map(uacpi_phys_addr addr, uacpi_size len) {
-    vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
     uint64_t aligned_addr = ALIGNPAGEDOWN(addr);
     for(uint64_t i = aligned_addr;i < aligned_addr + len;i += PAGE_SIZE) {
         vmmMapPage(vmmGetKernel(),i,(uint64_t)phys2Virt(i),PTE_PRESENT | PTE_WRITABLE);
     }
-    vmmActivatePML(virt2Phys((uint64_t)vmmGetKernel()));
     return phys2Virt(addr);
 }
 void uacpi_kernel_unmap(void *addr, uacpi_size len) {
@@ -131,7 +124,7 @@ void uacpi_kernel_free(void *mem) {
 }
 
 void uacpi_kernel_log(uacpi_log_level lvl, const uacpi_char* str) {
-    logPrintf("UACPI: %s\n",str);
+    logPrintf("UACPI: %s",str);
 }
 
 uacpi_u64 uacpi_kernel_get_nanoseconds_since_boot(void) {

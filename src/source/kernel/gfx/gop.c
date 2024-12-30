@@ -75,8 +75,7 @@ void gopBackBuffer(uint32_t* backbuffer) {
     gopBackBufferState = 1;
 }
 
-void gopSwap() {
-    vmmActivatePML(virt2Phys((uint64_t)vmmGetPMM()));
+void gopSwap() { // only from irq timer
     if(gopBackBufferState) 
         memcpy(gopFrameBufferBase,gopBackBufferBase,gopHeight*gopPitch);
 }

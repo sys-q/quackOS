@@ -12,7 +12,7 @@ void pitTick() {
 }
 
 void pitHandler(process_context_t* proc_ctx) {
-    scheduling_lock();
+    scheduling_lock(); // disable scheduling
     ticks++;
     if(ticks % (pit_freq / GOPFREQ) == 0) {
         gopSwap();
