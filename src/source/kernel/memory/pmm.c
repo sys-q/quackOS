@@ -60,7 +60,7 @@ void pmmInit() {
         bitmapSetBit(&biggest_entry.bitmap,i);
     }
 
-    printf("PMM Information: Biggest: base: 0x%p, size: 0x%p, bitmap: 0x%p\nBitmap: base: 0x%p, size:0x%p, count_pages: 0x%p\n",biggest_entry.base,biggest_entry.length,&biggest_entry.bitmap,biggest_entry.bitmap.bits,biggest_entry.bitmap.size,biggest_entry.bitmap.page_count);    
+    printf("PMM Information: Biggest: base: 0x%p, size: 0x%p (%d MB), bitmap: 0x%p\nBitmap: base: 0x%p, size:0x%p, count_pages: 0x%p\n",biggest_entry.base,biggest_entry.length,(biggest_entry.length / 1024) / 1024,&biggest_entry.bitmap,biggest_entry.bitmap.bits,biggest_entry.bitmap.size,biggest_entry.bitmap.page_count);    
 
 }
 

@@ -11,6 +11,8 @@
 #include <cpu/int/pic.h>
 #include <memory/pmm.h>
 #include <memory/paging.h>
+#include <scheduling/process.h>
+#include <scheduling/timers.h>
 #include <fthelper.h>
 #include <limine.h>
 
@@ -70,7 +72,8 @@ void kmain(void) {
     pmmInit();
     printf("Initializing Paging\n");
     pagingInit();
-    pmmZero();
-    *phys2Virt(pmmZero()) = 10;
+    printf("Initializing PIT\n");
+    pitInit(1000);
+    picClearMask(0);
     printf("Welcome to quackOS\n");
 }
