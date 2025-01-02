@@ -33,6 +33,7 @@ void pmmInit() {
     struct limine_memmap_entry* current_entry;
     for(uint64_t i = 0; i < memmap_request.response->entry_count;i++) {
         current_entry = memmap_request.response->entries[i];
+        printf("Entry #%d. Base: 0x%p, size: 0x%p, type: 0x%p\n",i,current_entry->base,current_entry->length,current_entry->type);
         if(current_entry->type == LIMINE_MEMMAP_USABLE) {
             if(current_entry->length > top) {
                 top = current_entry->length;
@@ -43,6 +44,8 @@ void pmmInit() {
     }
 
     // init bitmap
+
+    printf("Initializing Bitmap\n");
 
     uint64_t pageCount = biggest_entry.length / PAGE_SIZE;
     uint64_t bitmapSize = (pageCount + 7) / 8;
@@ -57,7 +60,7 @@ void pmmInit() {
         bitmapSetBit(&biggest_entry.bitmap,i);
     }
 
-    
+    printf("PMM Information: Biggest: base: 0x%p, size: 0x%p, bitmap: 0x%p\nBitmap: base: 0x%p, size:0x%p, count_pages: 0x%p\n",biggest_entry.base,biggest_entry.length,&biggest_entry.bitmap,biggest_entry.bitmap.bits,biggest_entry.bitmap.size,biggest_entry.bitmap.page_count);    
 
 }
 
@@ -126,4 +129,18 @@ void pmmVBigFree(void* start,uint64_t sizeinpages) {
     if(!phys_start)
         return;
     pmmBigFree(phys_start,sizeinpages);
+}
+
+uint64_t pmmZero() {
+    uint64_t phys = pmmAlloc();
+    memset(phys2Virt(phys),0,PAGE_SIZE);
+    return phys;
+}
+
+void* pmmVZero() {
+    return (void*)phys2Virt(pmmZero());
+}
+
+struct limine_memmap_request* pmmMap() {
+    return &memmap_request;
 }

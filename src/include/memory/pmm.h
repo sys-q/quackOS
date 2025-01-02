@@ -32,3 +32,9 @@ void pmmBigFree(uint64_t start,uint64_t sizeinpages);
 void* pmmVBigAlloc(uint64_t pages_count);
 
 void pmmVBigFree(void* start,uint64_t sizeinpages);
+
+uint64_t pmmZero();
+
+void* pmmVZero();
+
+struct limine_memmap_request* pmmMap();
