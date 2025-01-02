@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <kernelapi.h>
+#include <cpu/gdt.h>
 
 uint8_t tssStack[65536];
 
@@ -15,7 +15,7 @@ gdt_t gdt = {
 gdt_pointer_t gdt_pointer;
 tss_t tss;
 
-void InitTSS() {
+void tssInit() {
     tss.rsp[0] = (uint64_t)tssStack;
     tss.ist[1] = 0;
     tss.iopb_offsset = sizeof(tss);
@@ -25,8 +25,8 @@ void InitTSS() {
     gdt.tss.baseup32 = (uint64_t)&tss >> 32;
 }
 
-void initGDT() {
-    InitTSS();
+void gdtInit() {
+    tssInit();
     gdt_pointer.size = sizeof(gdt_t) -1;
     gdt_pointer.base = (uint64_t)&gdt;
     asmLoadGDT(&gdt_pointer);

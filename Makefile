@@ -1,6 +1,6 @@
 QEMU=qemu-system-x86_64
 QEMUPACKAGE=qemu-kvm
-QEMUFLAGS=-machine smm=off -s -S -no-reboot -m 256M -d int -drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-x86_64.fd,readonly=on
+QEMUFLAGS=-machine smm=off -s -no-reboot -m 1G -d int -drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-x86_64.fd,readonly=on
 CC=clang
 CFLAGS=-fno-stack-protector -Wall -target x86_64-pc-linux-gnu -Wextra -nostdinc -ffreestanding -m64 -march=x86-64 -I./freestanding-headers -I./src/include -std=gnu11 -Wno-implicit-function-declaration
 ASM=nasm

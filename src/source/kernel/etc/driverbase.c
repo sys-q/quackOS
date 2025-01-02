@@ -99,23 +99,23 @@ void hlt() {
 uint64_t rflags() {
     uint64_t rflags;
     __asm__ volatile (
-        "pushfq\n\t"      // Сохраняем RFLAGS на стек
-        "pop %0"          // Извлекаем значение из стека в переменную
-        : "=r" (rflags)   // Выходной операнд
+        "pushfq\n\t"     
+        "pop %0"        
+        : "=r" (rflags)   
     );
-    return rflags;        // Возвращаем сохраненное значение RFLAGS
+    return rflags;        
 }
 
 uint64_t cs() {
     uint64_t cs;
     asm volatile("mov %%cs, %0" : : "r" ((uint64_t)cs) : "memory");
-    return cs;        // Возвращаем сохраненное значение RFLAGS
+    return cs;     
 }
 
 uint64_t ss() {
     uint64_t ss;
     asm volatile("mov %%ss, %0" : : "r" ((uint64_t)ss) : "memory");
-    return ss;        // Возвращаем сохраненное значение RFLAGS
+    return ss;        
 }
 
 
@@ -160,7 +160,7 @@ size_t strlen(const char *str) {
 }
 
 void outbwait() {
-    outb(0x80, 0);
+    outb(0x80, 0);  
 }
 
 char* itoa(uint64_t value, char* str, int base ) {

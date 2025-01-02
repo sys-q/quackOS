@@ -2,6 +2,10 @@
     "files.associations": {
         "driverbase.h": "c",
         "kernelapi.h": "c",
-        "stdatomic.h": "c"
+        "stdatomic.h": "c",
+        "stdarg.h": "c",
+        "compare": "c",
+        "cstdint": "c",
+        "format": "c"
     }
 }
