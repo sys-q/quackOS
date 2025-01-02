@@ -9,6 +9,7 @@
 #include <cpu/int/idt.h>
 #include <cpu/int/panic.h>
 #include <cpu/int/pic.h>
+#include <memory/pmm.h>
 #include <fthelper.h>
 #include <limine.h>
 
@@ -62,5 +63,19 @@ void kmain(void) {
     gdtInit();
     printf("Initializing IDT\n");
     idtInit();
-    
+    picRemap();
+    printf("Initializing PMM\n");
+    pmmInit();
+    printf("PMM Test\n");
+    uint64_t one = pmmAlloc();
+    uint64_t two = pmmAlloc();
+    uint64_t three = pmmAlloc();
+    pmmFree(three);
+    uint64_t after_three = pmmAlloc();
+    uint64_t big = pmmBigAlloc(512);
+    uint64_t four = pmmAlloc();
+    pmmBigFree(big,512);
+    uint64_t five = pmmAlloc();
+    uint64_t six = pmmAlloc();
+    printf("One: 0x%p, two: 0x%p, three (free): 0x%p, after three: 0x%p, big (512 pages): 0x%p, four: 0x%p five (after big free): 0x%p,six: 0x%p\n",one,two,three,after_three,big,four,five,six);
 }
