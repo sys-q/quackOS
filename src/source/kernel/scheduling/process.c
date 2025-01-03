@@ -16,7 +16,7 @@ process_t* current;
 
 process_t* processCreate(uint64_t paging_flags) {
     process_t* proc = (process_t*)pmmVZero();
-    uint64_t rsp = (uint64_t)pmmVBigAlloc(PROCESS_STACK_SIZE);
+    uint64_t rsp = (uint64_t)pmmVBigAlloc(PROCESS_STACK_SIZE );
     uint64_t phys_rsp = (uint64_t)virt2Phys(rsp);
     memset(&proc->ctx,0,sizeof(process_context_t));
     proc->ctx.rsp = rsp + (PROCESS_STACK_SIZE * PAGE_SIZE);
@@ -79,6 +79,8 @@ void processWork(process_context_t* ctx) {
         current->ctx.rsp = ctx->rsp;
         current->ctx.rbp = ctx->rbp;
     }
+    
+    //printf("Scheduling: 0x%p 0x%p\n",current->ctx.rsp,ctx->rsp);
 
     if(current->next == 0)
         current = head;

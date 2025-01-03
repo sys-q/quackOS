@@ -20,8 +20,6 @@ processSchedule:
     mov [dummyContext + 24],rax
     mov rax,[rdi + 48]
     mov [dummyContext + 32],rax
-    mov rax,cr3
-    mov [dummyContext + 160],rax
     mov rdi,dummyContext
     call contextSave
     jmp processWork

@@ -39,15 +39,13 @@ static volatile LIMINE_REQUESTS_END_MARKER;
 
 void scheduling_test() {
     while(1) {
-        printf("Hello, from task 1 !\n");
-        hlt();
+        strlen("vvnxcvbnx");
     }
 }
 
 void schedultest2() {
     while(1) {
-        printf("Hello, from task 2 !\n");
-        hlt();
+        strlen("vvfvfdsfsdf");
     }
 }
 

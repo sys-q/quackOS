@@ -21,6 +21,7 @@ void flantermHelperWriteChar(char ch) {
 }
 
 void printf(char* format, ...) {
+    cli();
     va_list args;
     va_start(args, format);
     int i = 0;
@@ -47,4 +48,5 @@ void printf(char* format, ...) {
         i++;
     }
     va_end(args);
+    sti();
 }

@@ -1,3 +1,3 @@
 #define PAGE_SIZE 4096
 #define GOPFREQ 14
-#define PROCESS_STACK_SIZE 256 // 256 pages
+#define PROCESS_STACK_SIZE 2048 // 8 MB
