@@ -37,26 +37,22 @@ static volatile LIMINE_REQUESTS_START_MARKER;
 __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
-void scheduling_test() {
-    printf("Task 1 stage 1\n");
-    hlt();
-    printf("Task 1 stage 2\n");
-    hlt();
-    printf("Now just spamming with strlen\n");
+void kmain_task();
+
+void dummyTask() {
     while(1) {
-        strlen("vvnxcvbnx");
+        printf("1");
+        hlt();
     }
 }
 
-void schedultest2() {
-    printf("Task 2 stage 1\n");
-    hlt();
-    printf("Task 2 stage 2\n");
-    hlt();
-    printf("Now just spamming with strlen\n");
-    while(1) {
-        strlen("vvfvfdsfsdf");
+void dummyTask2() {
+    while (1)
+    {
+        printf("2");
+        hlt();
     }
+    
 }
 
 void kmain(void) {
@@ -98,8 +94,15 @@ void kmain(void) {
     pitInit(1000);
     printf("Initializing Scheduling\n");
     processQueue(0,0); // head
-    processQueue((uint64_t)scheduling_test,0);
-    processQueue((uint64_t)schedultest2,0);
+    processQueue((uint64_t)dummyTask,0);
+    processQueue((uint64_t)kmain_task,0);
+    processQueue((uint64_t)dummyTask2,0);
     picClearMask(0);
     printf("Welcome to quackOS\n");
+}
+
+void kmain_task() {
+    printf("Hello, World !\n");
+    printf("Creating test exception\n.");
+    asm volatile("int $90");
 }

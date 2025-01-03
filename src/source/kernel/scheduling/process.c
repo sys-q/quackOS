@@ -52,10 +52,8 @@ void processQueue(uint64_t rip,char user) {
     last = proc;
 }
 
-void processScheduleTimerEnd() {
-    if(!picIsDisabled()) {
-        
-    }
+process_t* currentProcess() {
+    return current;
 }
 
 void processWork(process_context_t* ctx) {
@@ -81,17 +79,19 @@ void processWork(process_context_t* ctx) {
         current->ctx.rip = ctx->rip;
     }
 
-    //printf("Scheduling: 0x%p 0x%p\n",current->ctx.rsp,ctx->rsp);
 
-    if(current->next == 0)
-        current = head;
-    
-    if(current->next->status != PROCESS_STATUS_KILL) {
+    while(1) {
+
+        if(current->next == 0)
+            current = head;
+        
+        if(current->next->status != PROCESS_STATUS_KILL) {
+            current = current->next;
+            contextSwitch(&current->ctx);
+        }
+
         current = current->next;
-        processScheduleTimerEnd();
-        contextSwitch(&current->ctx);
-    }
 
-    processSchedule(0);
+    }
 
 }

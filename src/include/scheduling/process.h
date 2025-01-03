@@ -54,6 +54,6 @@ process_t* processCreate(uint64_t paging_flags);
 
 void processQueue(uint64_t rip,char user);
 
-void processScheduleTimerEnd();
+process_t* currentProcess();
 
 void processWork(process_context_t* ctx);

@@ -5,11 +5,9 @@ extern exceptionHandler
 global isr_%+%1
 isr_%+%1:
     cli
-    mov rax,%+%1
-    push rax
-    mov rdi,rsp
-    call exceptionHandler
-    cli
+    mov rsp,kernel_panic_stack
+    mov rdi,%+%1
+    jmp exceptionHandler
     hlt
 %endmacro
 
@@ -17,10 +15,9 @@ isr_%+%1:
 global isr_%+%1
 isr_%+%1:
     cli
-    push 0
-    push %+%1
-    mov rdi,rsp
-    call exceptionHandler
+    mov rsp,kernel_panic_stack
+    mov rdi,%+%1
+    jmp exceptionHandler
     hlt
 %endmacro
 
@@ -52,3 +49,7 @@ isr_err_stub 21
 isr_no_err_stub 28
 isr_err_stub 29
 isr_err_stub 30
+
+section .bss
+resb 65565
+kernel_panic_stack:

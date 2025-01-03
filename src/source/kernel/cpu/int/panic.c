@@ -1,15 +1,29 @@
 
 #include <cpu/int/idt.h>
+#include <cpu/int/pic.h>
+#include <scheduling/process.h>
+#include <memory/paging.h>
 #include <limine.h>
 #include <driverbase.h>
 #include <fthelper.h>
 
 struct flanterm_ctx* ft_ctxA;
 
-void exceptionHandler(error_frame_t* err_frame) {
+void exceptionHandler(uint8_t vector) {
+    picSetMask(0);
+    pagingActivateKernel();
     flantermHelperInit(ft_ctxA);
+    process_t* proc = currentProcess();
+    if(proc != 0) {
+        printf("Process exception: ID: %d, RIP: 0x%p Error: 0x%p\n",proc->id,proc->ctx.rip,vector);
+        proc->status = PROCESS_STATUS_KILL;
+        proc->ctx.rip = 0;
+        proc->ctx.rsp = proc->start_rsp;
+        processWork(0);
+        hlt();
+    }
     printf("! Kernel panic !\n");
-    printf("Vector: 0x%p, RIP: 0x%p, error code: 0x%p\n",err_frame->vector,err_frame->rip,err_frame->error_code);
+    printf("See qemu for details\n");
     printf("For details check GDB\n");
     hlt();
 }
