@@ -78,8 +78,9 @@ void processWork(process_context_t* ctx) {
         current->ctx.rflags = ctx->rflags;
         current->ctx.rsp = ctx->rsp;
         current->ctx.rbp = ctx->rbp;
+        current->ctx.rip = ctx->rip;
     }
-    
+
     //printf("Scheduling: 0x%p 0x%p\n",current->ctx.rsp,ctx->rsp);
 
     if(current->next == 0)

@@ -42,7 +42,7 @@ void scheduling_test() {
     hlt();
     printf("Task 1 stage 2\n");
     hlt();
-    printf("Now just spamming with strlen");
+    printf("Now just spamming with strlen\n");
     while(1) {
         strlen("vvnxcvbnx");
     }
@@ -53,7 +53,7 @@ void schedultest2() {
     hlt();
     printf("Task 2 stage 2\n");
     hlt();
-    printf("Now just spamming with strlen");
+    printf("Now just spamming with strlen\n");
     while(1) {
         strlen("vvfvfdsfsdf");
     }

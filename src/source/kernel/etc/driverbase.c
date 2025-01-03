@@ -152,11 +152,12 @@ uint32_t inl(uint16_t port) {
 }
 
 size_t strlen(const char *str) {
-    const char *s = str;
-    while (*s) {
-        ++s;
+    uint64_t size = 0;
+    while (*str) {
+        ++str;
+        size++;
     }
-    return s - str;
+    return size;
 }
 
 void outbwait() {
