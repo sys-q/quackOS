@@ -38,12 +38,22 @@ __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
 void scheduling_test() {
+    printf("Task 1 stage 1\n");
+    hlt();
+    printf("Task 1 stage 2\n");
+    hlt();
+    printf("Now just spamming with strlen");
     while(1) {
         strlen("vvnxcvbnx");
     }
 }
 
 void schedultest2() {
+    printf("Task 2 stage 1\n");
+    hlt();
+    printf("Task 2 stage 2\n");
+    hlt();
+    printf("Now just spamming with strlen");
     while(1) {
         strlen("vvfvfdsfsdf");
     }
