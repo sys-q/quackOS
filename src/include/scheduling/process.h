@@ -45,3 +45,15 @@ typedef struct process {
     process_context_t ctx;
     struct process* next;
 } __attribute__((packed)) process_t;
+
+extern void contextSwitch(process_context_t* ctx);
+extern void contextSave(process_context_t* dest);
+extern void processSchedule(interrupt_context_t* ctx);
+
+process_t* processCreate(uint64_t paging_flags);
+
+void processQueue(uint64_t rip,char user);
+
+void processScheduleTimerEnd();
+
+void processWork(process_context_t* ctx);

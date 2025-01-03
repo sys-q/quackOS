@@ -3,6 +3,8 @@
 #include <cpu/int/pic.h>
 #include <stdint.h>
 
+char is_disabled_pic = 0;
+
 void picRemap() {
     uint8_t m1 = inb(0x21);
     uint8_t m2 = inb(0xA1);
@@ -52,4 +54,8 @@ void picClearMask(uint8_t irq) {
     }
     value = inb(port) & ~(1 << irq);
     outb(port,value);
+}
+
+char picIsDisabled() {
+    return is_disabled_pic;
 }

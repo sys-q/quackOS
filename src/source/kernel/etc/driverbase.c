@@ -203,6 +203,14 @@ uint64_t* phys2Virt(uint64_t address) {
     return (uint64_t*)((uint64_t)address + offset);
 }
 
+uint64_t nphys2Virt(void* address) {
+    return (uint64_t)address + offset;
+}
+
+uint64_t nvirt2Phys(void* address) {
+    return (uint64_t)address - offset;
+}
+
 void virtSetOffset(uint64_t ofset) {
     offset = ofset;
 }

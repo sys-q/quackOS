@@ -1,6 +1,6 @@
 QEMU=qemu-system-x86_64
 QEMUPACKAGE=qemu-kvm
-QEMUFLAGS=-machine smm=off -s -no-reboot -m 1G -d int -drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-x86_64.fd,readonly=on
+QEMUFLAGS=-machine smm=off -s -no-reboot -m 1G -d int
 CC=clang
 CFLAGS=-fno-stack-protector -Wall -target x86_64-pc-linux-gnu -Wextra -nostdinc -ffreestanding -m64 -march=x86-64 -I./freestanding-headers -I./src/include -std=gnu11 -Wno-implicit-function-declaration
 ASM=nasm
@@ -9,7 +9,7 @@ LD=ld
 LDFLAGS=-m elf_x86_64 -nostdlib -static -z max-page-size=0x1000 -gc-sections -T src/link.ld
 OUTPUTISO=build/output.iso
 XORRISO=xorriso
-XORRISOFLAGS=-as mkisofs -R -r -J -no-emul-boot -boot-load-size 4 -boot-info-table -hfsplus -apm-block-size 2048 --efi-boot boot/limine/limine-uefi-cd.bin -efi-boot-part --efi-boot-image --protective-msdos-label build -o $(OUTPUTISO)
+XORRISOFLAGS=-as mkisofs -R -r -J -b boot/limine/limine-bios-cd.bin -no-emul-boot -boot-load-size 4 -boot-info-table -hfsplus -apm-block-size 2048 --efi-boot boot/limine/limine-uefi-cd.bin -efi-boot-part --efi-boot-image --protective-msdos-label build -o $(OUTPUTISO)
 TARGETKERNEL=duckkernel
 
 CFILES=$(shell find src/source -name "*.c")
@@ -58,11 +58,7 @@ obj/%.c.o: %.c
 	mkdir -p "$$(dirname $@)"
 	$(CC) $(CFLAGS) -c $< -o $@
 
-ovmf/ovmf-code-x86_64.fd:
-	mkdir -p ovmf
-	curl -Lo $@ https://github.com/osdev0/edk2-ovmf-nightly/releases/latest/download/ovmf-code-x86_64.fd
-
-run: ovmf/ovmf-code-x86_64.fd
+run: 
 	@if ! command -v $(QEMU) > /dev/null 2>&1; then \
 		echo "Warning, $(QEMU) is not installed (sudo apt install $(QEMUPACKAGE))"; \
 		exit 1; \

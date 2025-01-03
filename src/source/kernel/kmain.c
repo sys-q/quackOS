@@ -37,6 +37,20 @@ static volatile LIMINE_REQUESTS_START_MARKER;
 __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
+void scheduling_test() {
+    while(1) {
+        printf("Hello, from task 1 !\n");
+        hlt();
+    }
+}
+
+void schedultest2() {
+    while(1) {
+        printf("Hello, from task 2 !\n");
+        hlt();
+    }
+}
+
 void kmain(void) {
     virtSetOffset(hhdm_request.response->offset);
     struct limine_framebuffer* fb = framebuffer_request.response->framebuffers[0];
@@ -74,6 +88,10 @@ void kmain(void) {
     pagingInit();
     printf("Initializing PIT\n");
     pitInit(1000);
+    printf("Initializing Scheduling\n");
+    processQueue(0,0); // head
+    processQueue((uint64_t)scheduling_test,0);
+    processQueue((uint64_t)schedultest2,0);
     picClearMask(0);
     printf("Welcome to quackOS\n");
 }
