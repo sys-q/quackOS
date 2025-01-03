@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 char is_disabled_pic = 0;
+char is_pit_disabled = 0;
 
 void picRemap() {
     uint8_t m1 = inb(0x21);
@@ -41,6 +42,7 @@ void picSetMask(uint8_t irq) {
     }
     value = inb(port) | (1 << irq);
     outb(port,value);
+    is_pit_disabled = 1;
 }
 
 void picClearMask(uint8_t irq) {
@@ -54,8 +56,13 @@ void picClearMask(uint8_t irq) {
     }
     value = inb(port) & ~(1 << irq);
     outb(port,value);
+    is_pit_disabled = 0;
 }
 
 char picIsDisabled() {
     return is_disabled_pic;
+}
+
+char picIsPitDisabled() {
+    return is_pit_disabled;
 }

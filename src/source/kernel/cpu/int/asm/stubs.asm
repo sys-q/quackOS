@@ -4,7 +4,6 @@ extern exceptionHandler
 %macro isr_err_stub 1
 global isr_%+%1
 isr_%+%1:
-    cli
     mov rsp,kernel_panic_stack
     mov rdi,%+%1
     jmp exceptionHandler
@@ -14,7 +13,6 @@ isr_%+%1:
 %macro isr_no_err_stub 1
 global isr_%+%1
 isr_%+%1:
-    cli
     mov rsp,kernel_panic_stack
     mov rdi,%+%1
     jmp exceptionHandler

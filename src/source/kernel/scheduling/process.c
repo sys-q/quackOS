@@ -87,6 +87,8 @@ void processWork(process_context_t* ctx) {
         
         if(current->next->status != PROCESS_STATUS_KILL) {
             current = current->next;
+            if(picIsPitDisabled())
+                picClearMask(0);
             contextSwitch(&current->ctx);
         }
 
