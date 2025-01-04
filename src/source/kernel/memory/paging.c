@@ -93,6 +93,10 @@ void pagingActivateKernel() {
     asm volatile("mov %0,%%cr3\n" : : "r" ((uint64_t)virt2Phys((uint64_t)kernel_pml)) : "memory" );
 }
 
+uint64_t pagingGetKernel() {
+    return (uint64_t)virt2Phys((uint64_t)kernel_pml);
+}
+
 void pagingInit() {
     pagingPAT(1,1);
     kernel_pml = (uint64_t*)pmmVZero();

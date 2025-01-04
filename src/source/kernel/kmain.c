@@ -11,10 +11,16 @@
 #include <cpu/int/pic.h>
 #include <memory/pmm.h>
 #include <memory/paging.h>
-#include <scheduling/process.h>
 #include <scheduling/timers.h>
+#include <etc/acpi.h>
 #include <fthelper.h>
 #include <limine.h>
+#include <uacpi/acpi.h>
+#include <uacpi/tables.h>
+#include <uacpi/status.h>
+#include <uacpi/utilities.h>
+#include <uacpi/resources.h>
+#include <uacpi/event.h>
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -37,22 +43,11 @@ static volatile LIMINE_REQUESTS_START_MARKER;
 __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
-void kmain_task();
+uint32_t* fb_ptr;
+uint32_t fb_pitch;
 
-void dummyTask() {
-    while(1) {
-        printf("1");
-        hlt();
-    }
-}
-
-void dummyTask2() {
-    while (1)
-    {
-        printf("2");
-        hlt();
-    }
-    
+void pixelDraw(uint32_t x,uint32_t y,uint32_t color) {
+    fb_ptr[y * (fb_pitch / 4) + x] = 0xffffff;
 }
 
 void kmain(void) {
@@ -75,6 +70,9 @@ void kmain(void) {
         0
     );
 
+    fb_ptr = fb->address;
+    fb->pitch = fb->pitch;
+
     ft_ctx->cursor_enabled = 0;
 
     setupPanicFlanterm(ft_ctx);
@@ -90,19 +88,21 @@ void kmain(void) {
     pmmInit();
     printf("Initializing Paging\n");
     pagingInit();
-    printf("Initializing PIT\n");
-    pitInit(1000);
-    printf("Initializing Scheduling\n");
-    processQueue(0,0); // head
-    processQueue((uint64_t)dummyTask,0);
-    processQueue((uint64_t)kmain_task,0);
-    processQueue((uint64_t)dummyTask2,0);
-    picClearMask(0);
-    printf("Welcome to quackOS\n");
-}
-
-void kmain_task() {
-    printf("Hello, World !\n");
-    printf("Creating test exception\n.");
-    asm volatile("int $90");
+    printf("Initializing ACPI\n");
+    earlyAcpiInit(); // uacpi_initialize(0);
+    printf("Early ACPI Initializied\n");
+    uacpi_table bgrt_pointer;
+    uacpi_status ret = uacpi_table_find_by_signature("BGRT",&bgrt_pointer);
+    if(ret != UACPI_STATUS_OK) {
+        printf("BGRT Table doenst present by your firmware (%d)\n",ret);
+    } else {
+        bgrt_table* bgrt = (bgrt_table*)bgrt_pointer.virt_addr;
+        printf("0x%p\n",bgrt->image_address);
+    }
+    printf("%d",ret);
+    while (1)
+    {
+        hlt();
+    }
+    
 }

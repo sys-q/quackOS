@@ -30,4 +30,6 @@ void pagingPAT(uint8_t idx, uint8_t type);
 
 void pagingActivateKernel();
 
+uint64_t pagingGetKernel();
+
 void pagingInit();

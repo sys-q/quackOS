@@ -2,18 +2,11 @@
 #include <stdint.h>
 #include <cpu/int/idt.h>
 #include <scheduling/timers.h>
-#include <scheduling/process.h>
 #include <memory/paging.h>
 #include <cpu/int/pic.h>
 
 uint32_t pit_freq;
 extern void irq_32();
-
-void timerHandler(interrupt_context_t* ctx) {
-
-    pagingActivateKernel();
-    processSchedule(ctx);
-}
 
 void pitInit(uint32_t freq) {
     uint16_t div = 1193182 / freq;
