@@ -34,7 +34,7 @@ void* easy_uacpi_alloc(uint64_t size) {
     uint64_t align_size;
     align_size = (size + 7) / 8 * 8;
     ptr += align_size;
-    return (void*)ptr - align_size;
+    return (void*)(ptr - align_size);
 }
 
 uacpi_status uacpi_kernel_get_rsdp(uacpi_phys_addr *out_rsdp_address) {
