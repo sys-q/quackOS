@@ -31,8 +31,10 @@ void* easy_uacpi_alloc(uint64_t size) {
     if(!ptr) {
         ptr = (uint64_t)pmmVBigAlloc(2048 * 2);
     }
-    ptr += size;
-    return (void*)ptr;
+    uint64_t align_size;
+    align_size = (size + 7) / 8 * 8;
+    ptr += align_size;
+    return (void*)ptr - align_size;
 }
 
 uacpi_status uacpi_kernel_get_rsdp(uacpi_phys_addr *out_rsdp_address) {
@@ -142,11 +144,10 @@ uacpi_status uacpi_kernel_io_write(
 
 void *uacpi_kernel_map(uacpi_phys_addr addr, uacpi_size len) {
     uint64_t aligned_phys = ALIGNPAGEDOWN(addr);
-    uint64_t aligned_virt = (uint64_t)phys2Virt(addr);
     for(uint64_t i = aligned_phys;i < aligned_phys + len;i+= PAGE_SIZE) {
         pagingMap(phys2Virt(pagingGetKernel()),i,(uint64_t)phys2Virt(i),PTE_PRESENT | PTE_WRITABLE);
     }
-    return (void*)aligned_virt;
+    return (void*)phys2Virt(addr);
 }
 
 void uacpi_kernel_unmap(void *addr, uacpi_size len) {
