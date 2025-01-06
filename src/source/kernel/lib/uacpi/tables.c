@@ -774,7 +774,7 @@ uacpi_status uacpi_for_each_table(
 
     for (idx = base_idx; idx < table_array_size(&tables); ++idx) {
         tbl = table_array_at(&tables, idx);
-
+        
         if (tbl->flags & UACPI_TABLE_INVALID)
             continue;
 

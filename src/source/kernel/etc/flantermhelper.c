@@ -6,6 +6,7 @@
 #include <stdarg.h>
 
 struct flanterm_context* ft_ctx;
+uint8_t printfDisableState = 0;
 
 void flantermHelperInit(struct flanterm_context* ft_context) {
     ft_ctx = ft_context;
@@ -20,8 +21,17 @@ void flantermHelperWriteChar(char ch) {
     flanterm_write(ft_ctx,&ch,1);
 }
 
+void printfDisable() {
+    printfDisableState = 1;
+}
+
+void printfEnable() {
+    printfDisableState = 0;
+}
+
 void printf(char* format, ...) {
-    cli();
+    if(printfDisableState) 
+        return;
     va_list args;
     va_start(args, format);
     int i = 0;
@@ -48,5 +58,4 @@ void printf(char* format, ...) {
         i++;
     }
     va_end(args);
-    sti();
 }

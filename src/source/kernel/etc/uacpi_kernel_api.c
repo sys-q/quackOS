@@ -163,7 +163,7 @@ void uacpi_kernel_free(void *mem) {
 }
 
 void uacpi_kernel_log(uacpi_log_level, const uacpi_char* str) {
-    printf("UACPI: %s\n",str);
+    printf("UACPI: %s",str);
 }
 
 uacpi_u64 uacpi_kernel_get_nanoseconds_since_boot(void) {

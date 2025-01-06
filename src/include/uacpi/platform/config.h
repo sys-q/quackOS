@@ -119,7 +119,7 @@ UACPI_BUILD_BUG_ON_WITH_MSG(
  * of one table descriptor is approximately 56 bytes.
  */
 #ifndef UACPI_STATIC_TABLE_ARRAY_LEN
-    #define UACPI_STATIC_TABLE_ARRAY_LEN 16
+    #define UACPI_STATIC_TABLE_ARRAY_LEN 128
 #endif
 
 UACPI_BUILD_BUG_ON_WITH_MSG(

@@ -67,6 +67,13 @@ run:
 
 run-build: build run
 
+ovmf/ovmf-code-x86_64.fd:
+	mkdir -p ovmf
+	curl -Lo $@ https://github.com/osdev0/edk2-ovmf-nightly/releases/latest/download/ovmf-code-x86_64.fd
+
+run-uefi: ovmf/ovmf-code-x86_64.fd
+	$(QEMU) -cdrom $(OUTPUTISO) $(QEMUFLAGS) -drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-x86_64.fd,readonly=on
+
 clean:
 	rm -rf build/*
 	rm -rf obj/*

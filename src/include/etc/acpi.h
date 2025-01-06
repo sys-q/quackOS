@@ -24,3 +24,25 @@ typedef struct __attribute__((packed)) {
     uint32_t x_offset;           
     uint32_t y_offset;           
 } bgrt_table;
+
+typedef struct __attribute__((packed)) {
+    uint16_t type;
+    uint32_t size;
+    uint16_t r1;
+    uint16_t r2;
+    uint32_t offset;
+} bgrt_bmp_header;
+
+typedef struct __attribute__((packed)) {
+    uint32_t size;
+    int32_t width;
+    int32_t height;
+    uint16_t planes;
+    uint16_t bit_count;
+    uint32_t compression;
+    uint32_t size_image;
+    uint32_t xpelspermeter;
+    uint32_t ypelspermeter;
+    uint32_t clrused;
+    uint32_t clrimportant;
+} bgrt_bmp_info;
