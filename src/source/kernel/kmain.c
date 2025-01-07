@@ -21,6 +21,8 @@
 #include <uacpi/utilities.h>
 #include <uacpi/resources.h>
 #include <uacpi/event.h>
+#include <etc/gfx.h>
+#include <etc/bmp.h>
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -43,13 +45,6 @@ static volatile LIMINE_REQUESTS_START_MARKER;
 __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
-uint32_t* fb_ptr;
-uint32_t fb_pitch;
-
-void pixelDraw(uint32_t x,uint32_t y,uint32_t color) {
-    fb_ptr[y * (fb_pitch / 4) + x]  = color;
-}
-
 void kmain(void) {
     virtSetOffset(hhdm_request.response->offset);
     struct limine_framebuffer* fb = framebuffer_request.response->framebuffers[0];
@@ -70,8 +65,7 @@ void kmain(void) {
         0
     );
 
-    fb_ptr = fb->address;
-    fb_pitch = fb->pitch;
+    gfxInit(fb->address,fb->pitch);
 
     ft_ctx->cursor_enabled = 0;
 
@@ -91,32 +85,7 @@ void kmain(void) {
     printf("Initializing ACPI\n");
     earlyAcpiInit(); // ret = uacpi_initialize(0);
     printf("Early ACPI Initializied\n");
-    uacpi_table bgrt_pointer;
-    uacpi_status ret = uacpi_table_find_by_signature("BGRT",&bgrt_pointer);
-    if(ret != UACPI_STATUS_OK) {
-        printf("BGRT Table doenst present by your firmware (%d)\n",ret);
-    } else {
-        bgrt_table* bgrt = (bgrt_table*)bgrt_pointer.virt_addr;
-        bgrt_bmp_header* bgrt_img = (bgrt_bmp_header*)phys2Virt(bgrt->image_address);
-        if(bgrt_img->type != 0x4D42) {
-            printf("BGRT is not correct .bmp file\n");
-        } else {
-            bgrt_bmp_info* bgrt_info = (bgrt_bmp_info*)phys2Virt(bgrt->image_address + sizeof(bgrt_bmp_header));
-            uint8_t* bgrt_start = (uint8_t*)phys2Virt(bgrt->image_address + bgrt_img->offset);
-            uint64_t rowSize = (bgrt_info->width * 3 + 3) & ~3;
-            for(uint64_t y = 0; y < bgrt_info->height; y++) {
-                uint64_t yA = bgrt_info->height - y;
-                for(uint64_t x = 0; x < bgrt_info->width; x++) {
-                    uint64_t offset = (y * rowSize) + (x * 3);
-                    uint8_t b = bgrt_start[offset];
-                    uint8_t g = bgrt_start[offset + 1];
-                    uint8_t r = bgrt_start[offset + 2];
-                    uint32_t color = (r << 16) | (g << 8) | b;
-                    pixelDraw(x + ((fb->width / 2) - (bgrt_info->width / 2)),(yA + ((fb->height / 2) - (bgrt_info->height / 2))),color);
-                }
-            }
-        }
-    }
+    bgrtDraw(fb->width,fb->height);
     while (1)
     {
         hlt();
