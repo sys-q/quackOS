@@ -104,7 +104,7 @@ void kmain(void) {
 
     bmp_info* bgrt_information = (bmp_info*)bgrtParse();
     if(bgrt_information) {
-        bgrtDraw(fb->width,fb->height,0,(fb->height / 2) - (bgrt_information->height + 15));
+        bgrtDraw(fb->width,fb->height,0,(fb->height / 2) - (bgrt_information->height - 5));
     }
     bmp_info* logo_bmp = parseBMP((uint64_t)logo);
     drawBMP((fb->width / 2) - (logo_bmp->width / 2),((fb->height / 2) - (logo_bmp->height - 2)) + 50,(uint64_t)logo,BGR24CUSTOMTRANSPARENTMODE);
