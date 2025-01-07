@@ -42,7 +42,6 @@ void picSetMask(uint8_t irq) {
     }
     value = inb(port) | (1 << irq);
     outb(port,value);
-    is_pit_disabled = 1;
 }
 
 void picClearMask(uint8_t irq) {
@@ -56,7 +55,12 @@ void picClearMask(uint8_t irq) {
     }
     value = inb(port) & ~(1 << irq);
     outb(port,value);
-    is_pit_disabled = 0;
+}
+
+void picDisable() {
+    outb(0x21,0xFF);
+    outb(0xA1,0xFF);
+    is_disabled_pic = 1;
 }
 
 char picIsDisabled() {

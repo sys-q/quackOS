@@ -8,6 +8,8 @@ void picSetMask(uint8_t irq);
 
 void picClearMask(uint8_t irq);
 
+void picDisable();
+
 char picIsDisabled();
 
 char picIsPitDisabled();

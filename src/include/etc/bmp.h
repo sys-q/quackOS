@@ -26,4 +26,8 @@ typedef struct __attribute__((packed)) {
 
 bmp_info* parseBMP(uint64_t addr);
 
-void drawBMP(uint64_t x,uint64_t y,uint64_t addr);
+#define BGR24MODE 0x1
+#define RGB24MODE 0x2
+#define BGR24CUSTOMTRANSPARENTMODE 0x3
+
+void drawBMP(uint64_t x,uint64_t y,uint64_t addr,uint8_t mode);

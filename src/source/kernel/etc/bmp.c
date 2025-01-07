@@ -8,7 +8,7 @@ bmp_info* parseBMP(uint64_t addr) {
     return (bmp_info*)(addr + sizeof(bmp_header));
 }
 
-void drawBMP(uint64_t xA,uint64_t yB,uint64_t addr) {
+void drawBMP(uint64_t xA,uint64_t yB,uint64_t addr,uint8_t mode) {
     bmp_header* bmp_img = (bmp_header*)addr;
     if(bmp_img->type != 0x4D42) {
         printf("Image is not correct .bmp file\n");
@@ -20,11 +20,26 @@ void drawBMP(uint64_t xA,uint64_t yB,uint64_t addr) {
             uint64_t yA = bmp_infoA->height - y;
             for(uint64_t x = 0; x < bmp_infoA->width; x++) {
                 uint64_t offset = (y * rowSize) + (x * 3);
-                uint8_t b = bmp_start[offset];
-                uint8_t g = bmp_start[offset + 1];
-                uint8_t r = bmp_start[offset + 2];
-                uint32_t color = (r << 16) | (g << 8) | b;
-                pixelDraw(x + xA,yA + yB,color);
+                uint32_t color;
+                if(mode == BGR24MODE || mode == BGR24CUSTOMTRANSPARENTMODE) {
+                    uint8_t b = bmp_start[offset];
+                    uint8_t g = bmp_start[offset + 1];
+                    uint8_t r = bmp_start[offset + 2];
+                    color = (r << 16) | (g << 8) | b;
+                } else if(mode == RGB24MODE) {
+                    uint8_t r = bmp_start[offset];
+                    uint8_t g = bmp_start[offset + 1];
+                    uint8_t b = bmp_start[offset + 2];
+                    color = (r << 16) | (g << 8) | b;
+                }
+                if(mode == BGR24CUSTOMTRANSPARENTMODE) {
+                    if(color != 0x000001) {
+                        pixelDraw(x + xA,yA + yB,color);
+                    }
+                } else {
+                    pixelDraw(x + xA,yA + yB,color);
+                }
+                
             }
         }
     }

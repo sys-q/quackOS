@@ -25,4 +25,6 @@ typedef struct __attribute__((packed)) {
     uint32_t y_offset;           
 } bgrt_table;
 
-void bgrtDraw(uint64_t width,uint64_t height);
+uint64_t bgrtParse();
+
+void bgrtDraw(uint64_t width,uint64_t height,int64_t offsetX,int64_t offsetY);
