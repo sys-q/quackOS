@@ -95,12 +95,6 @@ void kmain(void) {
     printf("Early ACPI Initializied\n");
     
     apicInit();
-    
-    for(uint64_t x = 0;x < fb->width;x++) {
-        for(uint64_t y =0;y < fb->height;y++) {
-            pixelDraw(x,y,0);
-        }
-    }
 
     bmp_info* bgrt_information = (bmp_info*)bgrtParse();
     if(bgrt_information) {

@@ -6,6 +6,10 @@ extern timerHandler
 
 global irq_32
 irq_32:
+    push rax
+    mov ax,0x20
+    out 0x20,ax
+    pop rax
     iretq
     
 
