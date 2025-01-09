@@ -19,6 +19,7 @@ OBJ=$(addprefix obj/,$(CFILES:.c=.c.o) $(ASFILES:.S=.S.o) $(ASMFILES:.asm=.asm.o
 build: clean prepare_build $(TARGETKERNEL)
 	cp -rf duckkernel build/boot/duckkernel
 	$(XORRISO) $(XORRISOFLAGS)
+	./limine/limine bios-install $(OUTPUTISO)
 
 prepare_build: check-packages $(TARGETKERNEL)
 	mkdir -p build

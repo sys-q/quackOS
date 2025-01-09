@@ -11,7 +11,7 @@
 #include <cpu/int/pic.h>
 #include <memory/pmm.h>
 #include <memory/paging.h>
-#include <scheduling/timers.h>
+#include <time/hpet.h>
 #include <etc/acpi.h>
 #include <fthelper.h>
 #include <limine.h>
@@ -23,6 +23,7 @@
 #include <uacpi/types.h>
 #include <uacpi/event.h>
 #include <etc/gfx.h>
+#include <time/cmos.h>
 #include <etc/bmp.h>
 #include <cpu/int/apic.h>
 
@@ -47,12 +48,15 @@ static volatile LIMINE_REQUESTS_START_MARKER;
 __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
+#ifdef LOGO
+
 uint8_t logo[] = {
     #embed "../res/logo.bmp"
 };
 
+#endif
+
 void kmain(void) {
-    
     
     virtSetOffset(hhdm_request.response->offset);
     struct limine_framebuffer* fb = framebuffer_request.response->framebuffers[0];
@@ -91,10 +95,18 @@ void kmain(void) {
     printf("Initializing Paging\n");
     pagingInit();
     printf("Initializing ACPI\n");
-    earlyAcpiInit(); // ret = uacpi_initialize(0);
+    earlyAcpiInit(); 
     printf("Early ACPI Initializied\n");
-    
     apicInit();
+    printf("APIC Initializied\n");
+
+#ifdef LOGO
+
+    for(uint64_t x = 0;x < fb->width;x++) {
+        for(uint64_t y = 0;y < fb->height;y++) {
+            pixelDraw(x,y,0);
+        }
+    }
 
     bmp_info* bgrt_information = (bmp_info*)bgrtParse();
     if(bgrt_information) {
@@ -103,10 +115,17 @@ void kmain(void) {
     bmp_info* logo_bmp = parseBMP((uint64_t)logo);
     drawBMP((fb->width / 2) - (logo_bmp->width / 2),((fb->height / 2) - (logo_bmp->height - 2)) + 50,(uint64_t)logo,BGR24CUSTOMTRANSPARENTMODE);
 
+#endif
+
+
+    
+
+    printf("HPET Sleep by 500 ms test\n");
 
     while (1)
     {
-        hlt();
+        printf("Current time: %d.%d.%d\n",cmosHour(),cmosMinute(),cmosSecond());
+        hpetSleep(1000 * 500);
     }
     
 }

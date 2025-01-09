@@ -8,4 +8,3 @@ make run-build
 ```
 
 also you need ld,clang,nasm,xorriso and make
-bios boot is only for virtual machines, for real pc only uefi
