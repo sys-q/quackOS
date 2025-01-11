@@ -1,18 +1,10 @@
-
 #include <stdint.h>
-#include <stdatomic.h>
-#include <etc/acpi.h>
+#include <etc/spinlock.h>
 
-void spinlock_lock(atomic_flag *lock) {
-    if(isEarly())
-        return; 
-    while(atomic_flag_test_and_set_explicit(lock,memory_order_acquire)) {
-        asm volatile("pause");
-    }
+void spinlock_lock(uint8_t* lock) {
+    while(__sync_lock_test_and_set(lock,1));
 }
 
-void spinlock_unlock(atomic_flag* lock) {
-    if(isEarly())
-        return; 
-    atomic_flag_clear_explicit(lock,memory_order_acquire);
+void spinlock_unlock(uint8_t* lock) {
+    __sync_lock_release(lock);
 }

@@ -12,7 +12,7 @@
 #include <memory/pmm.h>
 #include <memory/paging.h>
 #include <time/hpet.h>
-#include <etc/acpi.h>
+#include <acpi/acpi.h>
 #include <fthelper.h>
 #include <limine.h>
 #include <uacpi/acpi.h>
@@ -26,6 +26,10 @@
 #include <time/cmos.h>
 #include <etc/bmp.h>
 #include <cpu/int/apic.h>
+#include <pci/pci.h>
+#include <time/lapic_timer.h>
+#include <cpu/smp.h>
+#include <memory/heap.h>
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -84,22 +88,32 @@ void kmain(void) {
     setupPanicFlanterm(ft_ctx);
 
     flantermHelperInit(ft_ctx);
+    printf("Initializing PMM\n");
+    pmmInit();
+    printf("Initializing Kernel heap\n");
+    kmallocInit((uint64_t)pmmVBigAlloc(KMALLOC_SIZE_IN_PAGES),KMALLOC_SIZE_IN_PAGES);
     printf("Initializing GDT\n");
     gdtInit();
     printf("Initializing IDT\n");
     idtInit();
-    printf("Initializing PIC\n");
-    picRemap();
-    printf("Initializing PMM\n");
-    pmmInit();
     printf("Initializing Paging\n");
     pagingInit();
-    printf("Initializing ACPI\n");
-    earlyAcpiInit(); 
-    printf("Early ACPI Initializied\n");
+    printf("Initializing PIC\n");
+    picRemap();
+    printf("Initializing PCI\n");
+    pciScan();
+    printf("Initializing Early ACPI\n");
+    earlyAcpiInit();
+    printf("Initializing APIC\n");
     apicInit();
-    printf("APIC Initializied\n");
-
+    apicStart();
+    printf("Initializing HPET\n");
+    hpetInit();
+    printf("Initializing ACPI\n");
+    acpiInit();
+    printf("Initializing SMP\n");
+    smpInit();
+    
 #ifdef LOGO
 
     for(uint64_t x = 0;x < fb->width;x++) {
@@ -117,15 +131,9 @@ void kmain(void) {
 
 #endif
 
-
-    
-
-    printf("HPET Sleep by 500 ms test\n");
-
     while (1)
     {
-        printf("Current time: %d.%d.%d\n",cmosHour(),cmosMinute(),cmosSecond());
-        hpetSleep(1000 * 500);
+        hlt();
     }
     
 }

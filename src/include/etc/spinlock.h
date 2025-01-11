@@ -1,5 +1,5 @@
-#include <stdatomic.h>
+#include <stdint.h>
 
-void spinlock_lock(atomic_flag *lock);
+void spinlock_lock(uint8_t* lock);
 
-void spinlock_unlock(atomic_flag* lock);
+void spinlock_unlock(uint8_t* lock);

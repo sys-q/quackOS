@@ -14,6 +14,7 @@
 #include <time/hpet.h>
 #include <driverbase.h>
 #include <cpu/int/idt.h>
+#include <time/lapic_timer.h>
 
 uint64_t lapicVBase;
 
@@ -33,12 +34,16 @@ uint32_t lapicID() {
     return lapicRead(0x20) >> 24;
 }
 
-void lapicTimerCalibrate() {
-    lapicWrite(0,0);
-}
-
 void lapicEOI() {
     lapicWrite(0xb0,0);
+}
+
+uint64_t lapicBase() {
+    return lapicVBase;
+}
+
+void apicStart() {
+    lapicWrite(0xF0,lapicRead(0xF0) | 0x100);
 }
 
 void apicInit() {
@@ -53,8 +58,6 @@ void apicInit() {
         printf("LAPIC: 0x%p\n",lapic_base);
         picDisable();
         lapicEnable(lapic_base);
-        lapicWrite(0xF0,lapicRead(0xF0) | 0x100);
-        hpetInit();
 
     } else {
         printf("APIC doesnt present by your firmware (%d)\nHalting kernel\n",ret);

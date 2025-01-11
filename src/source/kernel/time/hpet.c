@@ -26,6 +26,10 @@ void hpetSleep(uint64_t usec) {
     }
 }
 
+uint64_t hpetNanoCounter() {
+    return hpetCounter() * hpetClockPeriod_nano;
+}
+
 void hpetInit() {
     uacpi_table hpet;
     uacpi_status ret = uacpi_table_find_by_signature("HPET",&hpet);
@@ -33,7 +37,7 @@ void hpetInit() {
         struct acpi_hpet* hpet_struct = ((struct acpi_hpet*)hpet.virt_addr);
         uint64_t minimal_tick = hpet_struct->min_clock_tick;
         hpetVBase = (uint64_t)phys2Virt(hpet_struct->address.address);
-        pagingMap(phys2Virt(pagingGetKernel()),(uint64_t)virt2Phys(hpetVBase),hpetVBase,PTE_PRESENT | PTE_WRITABLE);
+        pagingMap(phys2Virt(pagingGetKernel()),(uint64_t)virt2Phys(hpetVBase),hpetVBase, PTE_PRESENT | PTE_WRITABLE | PTE_CACHE_MMIO);
         uint64_t* hpet_config = (uint64_t*)(hpetVBase + 0x10);
         *hpet_config |= 1;
 

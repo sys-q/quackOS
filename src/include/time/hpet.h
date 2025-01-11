@@ -10,3 +10,5 @@ uint64_t hpetCounter();
 void hpetSleep(uint64_t usec);
 
 void hpetInit();
+
+uint64_t hpetNanoCounter();

@@ -1,5 +1,5 @@
 
-#include <etc/acpi.h>
+#include <acpi/acpi.h>
 #include <uacpi/uacpi.h>
 #include <uacpi/event.h>
 #include <memory/pmm.h>
@@ -29,7 +29,9 @@ void earlyAcpiInit() {
 void acpiInit() {
     early = 0;
     uacpi_status ret = uacpi_initialize(0);
-    
+    ret = uacpi_namespace_load();
+    ret = uacpi_namespace_initialize();
+    ret = uacpi_finalize_gpe_initialization();
 }
 
 uint64_t bgrtParse() {

@@ -1,8 +1,8 @@
 QEMU=qemu-system-x86_64
 QEMUPACKAGE=qemu-kvm
-QEMUFLAGS=-machine smm=off -s -no-reboot -m 1G -d int
+QEMUFLAGS=-machine smm=off -s -no-reboot -m 1G -d int -smp cores=4
 CC=clang
-CFLAGS=-fno-stack-protector -Wall -target x86_64-pc-linux-gnu -Wextra -nostdinc -ffreestanding -m64 -march=x86-64 -I./freestanding-headers -I./src/include -Wno-implicit-function-declaration
+CFLAGS=-fno-stack-protector -Wall -mgeneral-regs-only -target x86_64-pc-linux-gnu -Wextra -nostdinc -ffreestanding -m64 -march=x86-64 -I./freestanding-headers -I./src/include -Wno-implicit-function-declaration
 ASM=nasm
 ASMFLAGS=-Wall -f elf64
 LD=ld
