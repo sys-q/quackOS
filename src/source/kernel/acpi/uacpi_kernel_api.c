@@ -210,7 +210,7 @@ void uacpi_kernel_free_mutex(uacpi_handle handle) {
 }
 
 uacpi_handle uacpi_kernel_create_event(void) {
-    return (uacpi_handle)0;
+    return (uacpi_handle)1;
 }
 
 void uacpi_kernel_free_event(uacpi_handle) {
