@@ -113,6 +113,7 @@ void kmain(void) {
     earlyAcpiInit();
     printf("Initializing APIC\n");
     apicInit();
+    apicStart();
     printf("Initializing HPET\n");
     hpetInit();
     printf("Initializing ACPI\n");
@@ -120,10 +121,10 @@ void kmain(void) {
     hpetSleep(5000);
     printf("Initializing SMP\n");
     smpInit();
-    printf("Initializing Lapic timer\n");
-    lapicTimerEnable();
-    apicStart();
-    printf("test\n");
+    printf("Halting kernel\n");
+    while(1) {
+        hlt();
+    }
     
 #ifdef LOGO
 

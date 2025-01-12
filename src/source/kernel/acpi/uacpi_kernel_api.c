@@ -188,7 +188,7 @@ void uacpi_kernel_log(uacpi_log_level, const uacpi_char* str) {
 }
 
 uacpi_u64 uacpi_kernel_get_nanoseconds_since_boot(void) {
-    return hpetCounter() - boottime_request.response->boot_time;
+    return hpetNanoCounter();
 }
 
 void uacpi_kernel_stall(uacpi_u8 usec) {
