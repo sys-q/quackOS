@@ -11,6 +11,7 @@
 #include <cpu/int/pic.h>
 #include <memory/pmm.h>
 #include <memory/paging.h>
+#include <uacpi/kernel_api.h>
 #include <time/hpet.h>
 #include <acpi/acpi.h>
 #include <fthelper.h>
@@ -18,13 +19,14 @@
 #include <uacpi/acpi.h>
 #include <uacpi/tables.h>
 #include <uacpi/status.h>
+#include <uacpi/sleep.h>
 #include <uacpi/utilities.h>
 #include <uacpi/resources.h>
 #include <uacpi/types.h>
 #include <uacpi/event.h>
 #include <etc/gfx.h>
 #include <time/cmos.h>
-#include <etc/bmp.h>
+#include <image/bmp.h>
 #include <cpu/int/apic.h>
 #include <pci/pci.h>
 #include <time/lapic_timer.h>
@@ -59,6 +61,11 @@ uint8_t logo[] = {
 };
 
 #endif
+
+static uacpi_interrupt_ret test_power(uacpi_handle ctx) {
+    printf("Received powerbutton\n");
+    return UACPI_INTERRUPT_HANDLED;
+}
 
 void kmain(void) {
     
@@ -98,21 +105,25 @@ void kmain(void) {
     idtInit();
     printf("Initializing Paging\n");
     pagingInit();
-    printf("Initializing PIC\n");
-    picRemap();
+    printf("Disabling PIC\n");
+    picDisable();
     printf("Initializing PCI\n");
     pciScan();
     printf("Initializing Early ACPI\n");
     earlyAcpiInit();
     printf("Initializing APIC\n");
     apicInit();
-    apicStart();
     printf("Initializing HPET\n");
     hpetInit();
     printf("Initializing ACPI\n");
     acpiInit();
+    hpetSleep(5000);
     printf("Initializing SMP\n");
     smpInit();
+    printf("Initializing Lapic timer\n");
+    lapicTimerEnable();
+    apicStart();
+    printf("test\n");
     
 #ifdef LOGO
 

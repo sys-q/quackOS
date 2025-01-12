@@ -8,7 +8,7 @@
 #include <cpu/gdt.h>
 #include <cpu/int/idt.h>
 #include <memory/paging.h>
-#include <etc/spinlock.h>
+#include <lock/spinlock.h>
 #include <memory/heap.h>
 #include <time/lapic_timer.h>
 
@@ -24,7 +24,7 @@ void smpCpuBoot(struct limine_smp_info* cpu) {
     spinlock_lock(&lock_smp);
     pagingActivateKernel();
     gdtInit();
-    idtInit();
+    loadIDT();
     printf("CPU %d Booted !\n",cpu->processor_id);
     spinlock_unlock(&lock_smp);
     while(1) {

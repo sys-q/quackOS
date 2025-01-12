@@ -8,7 +8,7 @@
 #include <etc/gfx.h>
 #include <uacpi/tables.h>
 #include <variables.h>
-#include <etc/bmp.h>
+#include <image/bmp.h>
 
 char early = 1;
 

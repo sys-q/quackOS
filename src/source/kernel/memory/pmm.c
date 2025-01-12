@@ -4,6 +4,7 @@
 #include <driverbase.h>
 #include <fthelper.h>
 #include <memory/pmm.h>
+#include <lock/spinlock.h>
 
 __attribute__((used, section(".limine_requests")))
 static volatile struct limine_memmap_request memmap_request = {
@@ -25,6 +26,8 @@ int bitmapIsBitSet(bitmap_t *bmp, uint64_t index) {
     if (index >= bmp->size) return 0; 
     return (phys2Virt(bmp->bits)[index / 8] & (1ULL << (index % 8))) != 0;
 }
+
+uint8_t pmm_lock;
 
 memory_entry_t biggest_entry;
 
@@ -66,18 +69,23 @@ void pmmInit() {
 
 // return phys
 uint64_t pmmAlloc() {
+    spinlock_lock(&pmm_lock);
     for(uint64_t i = 0;i < biggest_entry.bitmap.page_count;i++) {
         if(!bitmapIsBitSet(&biggest_entry.bitmap,i)) {
             bitmapSetBit(&biggest_entry.bitmap,i);
+            spinlock_unlock(&pmm_lock);
             return (i * PAGE_SIZE) + biggest_entry.base;
         }
     }
-    
+    spinlock_unlock(&pmm_lock);
+    return 0;
 }
 
 void pmmFree(uint64_t phys) {
+    spinlock_lock(&pmm_lock);
     uint64_t page = (phys - biggest_entry.base) / PAGE_SIZE;
     bitmapClearBit(&biggest_entry.bitmap,page);
+    spinlock_unlock(&pmm_lock);
 }
 
 void* pmmVAlloc() {
@@ -89,6 +97,7 @@ void pmmVFree(void* addr) {
 }
 
 uint64_t pmmBigAlloc(uint64_t pages_count) {
+    spinlock_lock(&pmm_lock);
     uint64_t goodCount = 0;
     uint64_t goodStart = 0;
     for(uint64_t i = 0; i < biggest_entry.bitmap.page_count;i++) {
@@ -101,6 +110,7 @@ uint64_t pmmBigAlloc(uint64_t pages_count) {
                 for(uint64_t i = goodStart;i <= goodCount;i++) {
                     bitmapSetBit(&biggest_entry.bitmap,i);
                 }
+                spinlock_unlock(&pmm_lock);
                 return (goodStart * PAGE_SIZE) + biggest_entry.base;
             }
         } else {
@@ -108,13 +118,16 @@ uint64_t pmmBigAlloc(uint64_t pages_count) {
             goodStart = 0;
         }
     }
+    spinlock_unlock(&pmm_lock);
     return 0;
 }
 
 void pmmBigFree(uint64_t start,uint64_t sizeinpages) {
+    spinlock_lock(&pmm_lock);
     for(uint64_t i = (start - biggest_entry.base) / PAGE_SIZE; i < sizeinpages;i++) {
         bitmapClearBit(&biggest_entry.bitmap,i);
     }
+    spinlock_unlock(&pmm_lock);
 }
 
 void* pmmVBigAlloc(uint64_t pages_count) {

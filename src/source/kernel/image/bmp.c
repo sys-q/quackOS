@@ -1,7 +1,7 @@
 
 #include <stdint.h>
 #include <etc/gfx.h>
-#include <etc/bmp.h>
+#include <image/bmp.h>
 #include <fthelper.h>
 
 bmp_info* parseBMP(uint64_t addr) {

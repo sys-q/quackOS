@@ -1,6 +1,7 @@
 
 #include <flanterm/flanterm.h>
 #include <flanterm/backends/fb.h>
+#include <lock/spinlock.h>
 #include <driverbase.h>
 #include <stdint.h>
 #include <stdarg.h>
@@ -29,7 +30,10 @@ void printfEnable() {
     printfDisableState = 0;
 }
 
+uint8_t printf_lock = 0;
+
 void printf(char* format, ...) {
+    spinlock_lock(&printf_lock);
     if(printfDisableState) 
         return;
     va_list args;
@@ -58,4 +62,5 @@ void printf(char* format, ...) {
         i++;
     }
     va_end(args);
+    spinlock_unlock(&printf_lock);
 }

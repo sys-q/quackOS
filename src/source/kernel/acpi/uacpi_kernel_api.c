@@ -5,7 +5,7 @@
 #include <memory/pmm.h>
 #include <uacpi/kernel_api.h>
 #include <cpu/int/idt.h>
-#include <etc/spinlock.h>
+#include <lock/spinlock.h>
 #include <driverbase.h>
 #include <variables.h>  
 #include <limine.h>
@@ -188,7 +188,7 @@ void uacpi_kernel_log(uacpi_log_level, const uacpi_char* str) {
 }
 
 uacpi_u64 uacpi_kernel_get_nanoseconds_since_boot(void) {
-    return hpetNanoCounter() - boottime_request.response->boot_time;
+    return hpetCounter() - boottime_request.response->boot_time;
 }
 
 void uacpi_kernel_stall(uacpi_u8 usec) {

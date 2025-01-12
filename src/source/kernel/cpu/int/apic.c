@@ -27,7 +27,7 @@ uint32_t lapicRead(uint32_t reg) {
 }
 
 void lapicEnable(uint64_t phys) {
-    wrmsr64(0x1b,(phys & 0xfffff0000) | 0x800);
+    wrmsr64(0x1b,(phys & 0xfffff0000));
 }
 
 uint32_t lapicID() {
@@ -43,7 +43,7 @@ uint64_t lapicBase() {
 }
 
 void apicStart() {
-    lapicWrite(0xF0,lapicRead(0xF0) | 0x100);
+    lapicWrite(0xF0,0xFF | 0x100);
 }
 
 void apicInit() {
@@ -56,8 +56,7 @@ void apicInit() {
         lapicVBase = (uint64_t)phys2Virt(lapic_base);
         pagingMap(phys2Virt(pagingGetKernel()),lapic_base,(uint64_t)phys2Virt(lapic_base),PTE_PRESENT | PTE_WRITABLE);
         printf("LAPIC: 0x%p\n",lapic_base);
-        picDisable();
-        lapicEnable(lapic_base);
+        lapicWrite(0xF0,lapicRead(0xF0) | 0x100);
 
     } else {
         printf("APIC doesnt present by your firmware (%d)\nHalting kernel\n",ret);

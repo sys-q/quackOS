@@ -2,6 +2,9 @@
 #include <stdint.h>
 #include <memory/heap.h>
 #include <variables.h>
+#include <lock/spinlock.h>
+
+uint8_t heap_lock = 0;
 
 void initHeap(uint64_t start,uint64_t page_count) {
     kernel_heap_block_t* head = (kernel_heap_block_t*)start;
@@ -47,9 +50,14 @@ void kmallocInit(uint64_t start,uint64_t size_in_pages) {
 }
 
 void* kmalloc(uint64_t size) {
-    return heapMalloc(kmalloc_start,size);
+    spinlock_lock(&heap_lock);
+    void* addr = heapMalloc(kmalloc_start,size);
+    spinlock_unlock(&heap_lock);
+    return addr;
 }
 
 void kfree(void* ptr) {
+    spinlock_lock(&heap_lock);
     heapFree(ptr);
+    spinlock_unlock(&heap_lock);
 }

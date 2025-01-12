@@ -18,9 +18,9 @@ void lapicTimerEnable() {
     lapicWrite(0x3E0,0x3);
     lapicWrite(0x380,0xFFFFFFFF);
     hpetSleep(10000);
-    lapicWrite(0x320,0 | (1 << 16)); // set mask
+    lapicWrite(0x320,32 | (1 << 16)); 
     uint64_t ticks = 0xFFFFFFFF - lapicRead(0x390);
-    lapicWrite(0x320,32 | (0 << 16) | (1 << 17));
+    lapicWrite(0x320,32 | 0x20000);
     lapicWrite(0x3E0,0x3);
     lapicWrite(0x380,ticks);
 }
