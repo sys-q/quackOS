@@ -55,8 +55,8 @@ void lapicInit() {
 
     if(ret == UACPI_STATUS_OK) { 
         pagingMap(phys2Virt(pagingGetKernel()),(uint64_t)virt2Phys(lapicBase()),lapicBase(),PTE_PRESENT | PTE_WRITABLE | PTE_CACHE_MMIO);
-        lapicTimerEnable();
         lapicCPUEnable();
+        lapicTimerEnable();
         printf("LAPIC Base: 0x%p 0x%p\n",lapicBase(),rdmsr64(0x1b));
     } else {
         printf("APIC doesnt present by your firmware (%d)\nHalting kernel\n",ret);

@@ -51,7 +51,6 @@ void idtSetDescriptor(uint8_t index,void* isr,uint8_t flags) {
 
 void loadIDT(idtr_t idtr) {
     asm volatile("lidt %0" : : "m"(idtr));
-    asm volatile("sti");
 }
 
 extern void dummyIRQ();

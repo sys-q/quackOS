@@ -121,6 +121,7 @@ void kmain(void) {
     smpInit();
     printf("Initializing APIC\n");
     lapicInit();
+    sti();
     while(1) {
         hlt();
     }

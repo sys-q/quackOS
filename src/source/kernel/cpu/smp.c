@@ -24,6 +24,7 @@ uint8_t lock_smp;
 
 void smpCpuBoot(struct limine_smp_info* cpu) {
     spinlock_lock(&lock_smp);
+    cli();
     pagingActivateKernel();
     gdtInit();
     idtInit();
