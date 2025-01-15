@@ -11,6 +11,8 @@
 #include <lock/spinlock.h>
 #include <memory/heap.h>
 #include <time/lapic_timer.h>
+#include <cpu/int/apic.h>
+#include <cpu/data.h>
 
 __attribute__((used, section(".limine_requests")))
 static volatile struct limine_smp_request smp_request = {
@@ -24,9 +26,18 @@ void smpCpuBoot(struct limine_smp_info* cpu) {
     spinlock_lock(&lock_smp);
     pagingActivateKernel();
     gdtInit();
-    loadIDT();
-    printf("CPU %d Booted !\n",cpu->processor_id);
+    idtInit();
+    fetchData()->smp_info = cpu;  
+    lapicInit();
+    if(fetchData()->smp_info->lapic_id != lapicID()) {
+        printf("CPU %d Error: Wrong LAPIC ID\n");
+        cli();
+        hlt();
+    } else {
+        printf("CPU %d Booted !\n",cpu->processor_id);
+    }
     spinlock_unlock(&lock_smp);
+    sti();
     while(1) {
         hlt();
     }

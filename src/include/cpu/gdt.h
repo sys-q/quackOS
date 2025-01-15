@@ -1,6 +1,8 @@
 
 #include <stdint.h>
 
+#pragma once
+
 typedef struct __attribute__((packed)) {
     uint16_t size;
     uint64_t base;

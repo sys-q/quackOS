@@ -15,19 +15,18 @@
 #include <driverbase.h>
 #include <cpu/int/idt.h>
 #include <time/lapic_timer.h>
-
-uint64_t lapicVBase;
+#include <cpu/data.h>
 
 void lapicWrite(uint32_t reg,uint32_t value) {
-    *(uint32_t*)(lapicVBase + reg) = value;
+    *(volatile uint32_t*)(lapicBase() + reg) = value;
 }
 
 uint32_t lapicRead(uint32_t reg) {
-    return *(uint32_t*)(lapicVBase + reg);
+    return *(volatile uint32_t*)(lapicBase() + reg);
 }
 
-void lapicEnable(uint64_t phys) {
-    wrmsr64(0x1b,(phys & 0xfffff0000));
+void lapicEnable() {
+    wrmsr64(0x1b,rdmsr64(0x1b));
 }
 
 uint32_t lapicID() {
@@ -39,25 +38,26 @@ void lapicEOI() {
 }
 
 uint64_t lapicBase() {
-    return lapicVBase;
+    return (uint64_t)phys2Virt(rdmsr64(0x1b) & 0xfffff000);
 }
 
-void apicStart() {
+void lapicCPUEnable() {
+    lapicEnable();
     lapicWrite(0xF0,0xFF | 0x100);
 }
 
-void apicInit() {
+uint32_t i1 = 0;
+uint32_t i2 = 0;
+
+void lapicInit() {
     uacpi_table apic;
     uacpi_status ret = uacpi_table_find_by_signature("APIC",&apic);
 
     if(ret == UACPI_STATUS_OK) { 
-        struct acpi_madt* apic_struct = ((struct acpi_madt*) apic.virt_addr);
-        uint64_t lapic_base = rdmsr64(0x1b) | 0xfffff000;
-        lapicVBase = (uint64_t)phys2Virt(lapic_base);
-        pagingMap(phys2Virt(pagingGetKernel()),lapic_base,(uint64_t)phys2Virt(lapic_base),PTE_PRESENT | PTE_WRITABLE);
-        printf("LAPIC: 0x%p\n",lapic_base);
-        lapicWrite(0xF0,lapicRead(0xF0) | 0x100);
-
+        pagingMap(phys2Virt(pagingGetKernel()),(uint64_t)virt2Phys(lapicBase()),lapicBase(),PTE_PRESENT | PTE_WRITABLE | PTE_CACHE_MMIO);
+        lapicTimerEnable();
+        lapicCPUEnable();
+        printf("LAPIC Base: 0x%p 0x%p\n",lapicBase(),rdmsr64(0x1b));
     } else {
         printf("APIC doesnt present by your firmware (%d)\nHalting kernel\n",ret);
         cli();hlt();

@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#pragma once
+
 void picRemap();
 
 void picEOI(uint8_t irq);

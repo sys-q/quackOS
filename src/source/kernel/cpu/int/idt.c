@@ -1,4 +1,6 @@
 
+#include <cpu/data.h>
+#include <memory/heap.h>
 #include <cpu/int/idt.h>
 
 extern void isr_0();
@@ -33,11 +35,10 @@ void* isr_table[32] = {
     isr_18,isr_19,isr_20,isr_reserved,isr_reserved,isr_reserved,isr_reserved,isr_reserved,isr_reserved,isr_reserved,isr_reserved,isr_reserved,isr_30
 };
 
-static idt_entry_t idt[256];
-static idtr_t idtr;
-uint8_t vectors[256];
-
 void idtSetDescriptor(uint8_t index,void* isr,uint8_t flags) {
+    cpu_data_t* data = fetchData();
+    idt_entry_t* idt = data->start_idt;
+    uint8_t* vectors = data->vectors;
     idt[index].baselow = (uint64_t)isr & 0xFFFF;
     idt[index].cs = 0x08;
     idt[index].ist = 0;
@@ -48,7 +49,7 @@ void idtSetDescriptor(uint8_t index,void* isr,uint8_t flags) {
     vectors[index] = 1;
 }
 
-void loadIDT() {
+void loadIDT(idtr_t idtr) {
     asm volatile("lidt %0" : : "m"(idtr));
     asm volatile("sti");
 }
@@ -56,6 +57,8 @@ void loadIDT() {
 extern void dummyIRQ();
 
 uint8_t allocIRQ() {
+    cpu_data_t* data = fetchData();
+    uint8_t* vectors = data->vectors;
     for(uint8_t index = 32;index < 256;index++) {
         if(!vectors[index])
             return index;
@@ -63,13 +66,21 @@ uint8_t allocIRQ() {
 }
 
 void freeIRQ(uint8_t index) {
-    idtSetDescriptor(index,dummyIRQ,0x8E);
+    cpu_data_t* data = fetchData();
+    uint8_t* vectors = data->vectors;
     vectors[index] = 0;
 }
 
 void idtInit() {
-    idtr.base = (uint64_t)&idt[0];
-    idtr.limit = (uint16_t)sizeof(idt_entry_t) * 256 -1;
+    cpu_data_t* data = fetchData();
+    idtr_t* idtr = (idtr_t*)kmalloc(sizeof(idtr_t));
+    idt_entry_t* idt = (idt_entry_t*)kmalloc(sizeof(idt_entry_t) * 256);
+    uint8_t* vectors = (uint8_t*)kmalloc(256);
+    data->start_idt = idt;
+    data->vectors = vectors;
+    idtr->base = (uint64_t)idt;
+    idtr->limit = (uint16_t)sizeof(idt_entry_t) * 256 -1;
+
     for(uint8_t index = 0;index < 32;index++) {
         idtSetDescriptor(index,isr_table[index],0x8E);
         vectors[index] = 1;
@@ -79,5 +90,6 @@ void idtInit() {
         vectors[index] = 0; // dummy 
     }
     vectors[0x80] = 1; // reserve int 0x80
-    loadIDT();
+    data->idtr = idtr;
+    loadIDT(*idtr);
 }

@@ -32,6 +32,7 @@
 #include <time/lapic_timer.h>
 #include <cpu/smp.h>
 #include <memory/heap.h>
+#include <cpu/data.h>
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -111,9 +112,6 @@ void kmain(void) {
     pciScan();
     printf("Initializing Early ACPI\n");
     earlyAcpiInit();
-    printf("Initializing APIC\n");
-    apicInit();
-    apicStart();
     printf("Initializing HPET\n");
     hpetInit();
     printf("Initializing ACPI\n");
@@ -121,7 +119,8 @@ void kmain(void) {
     hpetSleep(5000);
     printf("Initializing SMP\n");
     smpInit();
-    printf("Halting kernel\n");
+    printf("Initializing APIC\n");
+    lapicInit();
     while(1) {
         hlt();
     }

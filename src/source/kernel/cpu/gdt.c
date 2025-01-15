@@ -4,6 +4,7 @@
 #include <memory/heap.h>
 #include <variables.h>
 #include <driverbase.h>
+#include <cpu/data.h>
 
 gdt_t original_gdt = {
     {0,0,0,0,0,0}, // 0x0 null
@@ -34,4 +35,8 @@ void gdtInit() {
     gdt_pointer->base = (uint64_t)gdt;
     asmLoadGDT(gdt_pointer);
     asmLoadTSS();
+    printf("Allocating CPU Data\n");
+    cpu_data_t* data = createData();
+    data->gdt = gdt;
+    data->gdtr = gdt_pointer;
 }
